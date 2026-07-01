@@ -11,9 +11,10 @@ final storageServiceProvider = Provider<StorageService>((ref) {
 final initialRouteProvider = FutureProvider<String>((ref) async {
   final storage = ref.read(storageServiceProvider);
 
-  static String get _appDebug => dotenv.env['APP_DEBUG'] == 'true';
-  if (_appDebug) {
-    await storage.clearAllData(); // debug
+  final appDebug = dotenv.env['APP_DEBUG'] == 'true';
+
+  if (appDebug) {
+    await storage.clearAllData();
   }
 
   // cek apakah sudah ada data di storage, buat jika belum ada

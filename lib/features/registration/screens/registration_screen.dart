@@ -1,11 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jahitin_mobile/features/home/sreens/home_screens.dart';
 import 'package:unique_device_identifier/unique_device_identifier.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/storage_keys.dart';
 import '../../../core/services/api_service.dart';
 import '../../../core/services/storage_service.dart';
 import '../../auth/screens/login_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:math';
+
+String generateRandomString(int length) {
+  const chars =
+      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+  final random = Random();
+
+  return List.generate(
+    length,
+    (_) => chars[random.nextInt(chars.length)],
+  ).join();
+}
+
+class AppConfig {
+  static bool get isDebug => dotenv.env['APP_DEBUG']?.toLowerCase() == 'true';
+}
 
 class RegistrationScreen extends ConsumerStatefulWidget {
   const RegistrationScreen({super.key});
@@ -42,7 +61,11 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
       //     await storage.getDeviceId() ??
       //     await UniqueDeviceIdentifier.getUniqueIdentifier() ??
       //     '';
-      final deviceId = randomString(16); // generate random string as device ID
+      final deviceId = AppConfig.isDebug
+          ? generateRandomString(16)
+          : await storage.getDeviceId() ??
+                await UniqueDeviceIdentifier.getUniqueIdentifier() ??
+                ''; // generate random string as device ID
 
       await ApiService.registerLocal(
         name: _nameController.text.trim(),
@@ -57,7 +80,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
 
       Navigator.of(
         context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
     } on ApiException catch (e) {
       setState(() => _errorMessage = e.message);
     } catch (_) {
