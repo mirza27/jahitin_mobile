@@ -1,43 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jahitin_mobile/features/home/sreens/home_screens.dart';
+import 'package:jahitin_mobile/features/splash/splash_provider.dart';
+import 'package:jahitin_mobile/features/splash/splash_state.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/providers/storage_provider.dart';
-import '../../registration/screens/registration_screen.dart';
 import '../../auth/screens/login_screen.dart';
+import '../../registration/screens/registration_screen.dart';
 
-class SplashScreen extends ConsumerWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // cek state awal
-    final routeAsync = ref.watch(initialRouteProvider);
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+}
 
-    routeAsync.whenData((route) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted) return;
-
-        late final Widget target;
-
-        if (route == 'home') {
-          target = const HomeScreen();
-        }
-
-        if (route == 'login') {
-          target = const LoginScreen();
-        }
-
-        if (route == 'unregistered') {
-          target = const RegistrationScreen();
-        }
-
-        Navigator.of(
-          context,
-        ).pushReplacement(MaterialPageRoute(builder: (_) => target));
-      });
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(splashProvider.notifier).initialize();
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    final splash = ref.watch(splashProvider);
+
+    if (splash.status != SplashStatus.success || splash.appState == null) {
+      return _buildSplashView();
+    }
+
+    switch (splash.appState!) {
+      case AppState.registered:
+        return const LoginScreen();
+      case AppState.unregistered:
+        return const RegistrationScreen();
+    }
+  }
+
+  Widget _buildSplashView() {
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: Center(
@@ -73,27 +74,6 @@ class SplashScreen extends ConsumerWidget {
               style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 48),
-            routeAsync.when(
-              data: (_) => const SizedBox.shrink(),
-              loading: () => const CircularProgressIndicator(
-                color: AppColors.primary,
-                strokeWidth: 2.5,
-              ),
-              error: (e, _) => Column(
-                children: [
-                  const Icon(Icons.error_outline, color: AppColors.error),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Gagal memuat: $e',
-                    style: const TextStyle(
-                      color: AppColors.error,
-                      fontSize: 12,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),

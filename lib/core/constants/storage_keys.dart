@@ -11,22 +11,23 @@ class StorageKeys {
   static const String authType = 'auth_type';
 }
 
-class AppState {
-  AppState._();
+// check wheter the app ever been launched / installed
+class StorageAppState {
+  StorageAppState._();
 
   static const String unregistered = 'unregistered';
   static const String registered = 'registered';
 }
 
-class AuthType {
-  AuthType._();
+class StorageAuthType {
+  StorageAuthType._();
 
   static const String local = 'local';
   static const String online = 'online';
 }
 
-class LoginStatus {
-  LoginStatus._();
+class StorageLoginStatus {
+  StorageLoginStatus._();
 
   static const String loggedOut = 'loggedOut';
   static const String loggedIn = 'loggedIn';

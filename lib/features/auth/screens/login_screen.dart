@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jahitin_mobile/features/auth/auth_provider.dart';
+import 'package:jahitin_mobile/features/auth/auth_state.dart';
+import 'package:jahitin_mobile/features/home/sreens/home_screens.dart';
 import '../../../core/constants/app_colors.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -14,7 +17,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _isLoading = false;
   bool _obscurePassword = true;
 
   @override
@@ -27,25 +29,43 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _onLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _isLoading = true);
-
-    // TODO: call login API, then save token & user data
-    await Future.delayed(const Duration(milliseconds: 800));
+    final success = await ref
+        .read(authProvider.notifier)
+        .login(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
 
     if (!mounted) return;
-    setState(() => _isLoading = false);
 
-    // TODO: navigate to home screen after successful login
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Login berhasil! (belum terhubung ke API)'),
-        backgroundColor: AppColors.success,
-      ),
-    );
+    if (!success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Login belum terhubung ke API'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final auth = ref.watch(authProvider);
+
+    if (auth.status == AuthStatus.initial) {
+      Future.microtask(() {
+        ref.read(authProvider.notifier).initialize();
+      });
+    }
+
+    if (auth.status == AuthStatus.authenticated) {
+      return const HomeScreen();
+    }
+
+    if (auth.status == AuthStatus.loading) {
+      return _buildLoadingView();
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -65,6 +85,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLoadingView() {
+    return const Scaffold(
+      backgroundColor: AppColors.background,
+      body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
     );
   }
 
@@ -263,7 +290,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       width: double.infinity,
       height: 52,
       child: ElevatedButton(
-        onPressed: _isLoading ? null : _onLogin,
+        onPressed: ref.read(authProvider).status == AuthStatus.loading
+            ? null
+            : _onLogin,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primaryMedium,
@@ -273,7 +302,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           elevation: 0,
         ),
-        child: _isLoading
+        child: ref.watch(authProvider).status == AuthStatus.loading
             ? const SizedBox(
                 width: 22,
                 height: 22,

@@ -19,7 +19,7 @@ class StorageService {
 
     await _storage.write(
       key: StorageKeys.appState,
-      value: AppState.unregistered,
+      value: StorageAppState.unregistered,
     );
     await _storage.write(key: StorageKeys.loginStatus, value: 'false');
     if (deviceId != null) {
@@ -29,9 +29,14 @@ class StorageService {
     return true;
   }
 
-  Future<String?> getAppState() => _storage.read(key: StorageKeys.appState);
+  Future<String?> getAppState() => _storage.read(
+    key: StorageKeys.appState,
+  ); // app state can be 'registered' or 'unregistered'
+
   Future<String?> getLoginStatus() =>
       _storage.read(key: StorageKeys.loginStatus);
+  // login status can be 'true' or 'false'
+
   Future<String?> getDeviceId() => _storage.read(key: StorageKeys.deviceId);
   Future<String?> getToken() => _storage.read(key: StorageKeys.token);
   Future<String?> getUserId() => _storage.read(key: StorageKeys.userId);

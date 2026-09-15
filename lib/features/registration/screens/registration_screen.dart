@@ -1,30 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jahitin_mobile/features/home/sreens/home_screens.dart';
-import 'package:unique_device_identifier/unique_device_identifier.dart';
+import 'package:jahitin_mobile/features/registration/registration_provider.dart';
+import 'package:jahitin_mobile/features/registration/registration_state.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/storage_keys.dart';
-import '../../../core/services/api_service.dart';
-import '../../../core/services/storage_service.dart';
-import '../../auth/screens/login_screen.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:math';
-
-String generateRandomString(int length) {
-  const chars =
-      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
-  final random = Random();
-
-  return List.generate(
-    length,
-    (_) => chars[random.nextInt(chars.length)],
-  ).join();
-}
-
-class AppConfig {
-  static bool get isDebug => dotenv.env['APP_DEBUG']?.toLowerCase() == 'true';
-}
 
 class RegistrationScreen extends ConsumerStatefulWidget {
   const RegistrationScreen({super.key});
@@ -37,61 +16,30 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
 
-  bool _isLoading = false;
-  String? _errorMessage;
-
   @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
   }
 
-  // registrasi awal set selalu lokal
   Future<void> _onRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+    final success = await ref
+        .read(registrationProvider.notifier)
+        .registerUser(_nameController.text.trim());
 
-    try {
-      final storage = StorageService();
-      // final deviceId =
-      //     await storage.getDeviceId() ??
-      //     await UniqueDeviceIdentifier.getUniqueIdentifier() ??
-      //     '';
-      final deviceId = AppConfig.isDebug
-          ? generateRandomString(16)
-          : await storage.getDeviceId() ??
-                await UniqueDeviceIdentifier.getUniqueIdentifier() ??
-                ''; // generate random string as device ID
-
-      await ApiService.registerLocal(
-        name: _nameController.text.trim(),
-        deviceId: deviceId,
-      );
-
-      await storage.setAppState(AppState.registered);
-      await storage.setAuthType(AuthType.local);
-      await storage.setLoginStatus(LoginStatus.loggedIn);
-
-      if (!mounted) return;
-
+    if (success && mounted) {
       Navigator.of(
         context,
       ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
-    } on ApiException catch (e) {
-      setState(() => _errorMessage = e.message);
-    } catch (_) {
-      setState(() => _errorMessage = 'Terjadi kesalahan. Coba lagi.');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final registration = ref.watch(registrationProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -105,7 +53,8 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
               const SizedBox(height: 40),
               _buildForm(),
               const SizedBox(height: 32),
-              if (_errorMessage != null) _buildErrorBanner(),
+              if (registration.status == RegistrationStatus.error)
+                _buildErrorBanner(registration.message),
               _buildRegisterButton(),
               const SizedBox(height: 24),
             ],
@@ -227,7 +176,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
     );
   }
 
-  Widget _buildErrorBanner() {
+  Widget _buildErrorBanner(String? message) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Container(
@@ -244,7 +193,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                _errorMessage!,
+                message ?? 'Terjadi kesalahan. Coba lagi.',
                 style: const TextStyle(fontSize: 13, color: AppColors.error),
               ),
             ),
@@ -255,11 +204,14 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
   }
 
   Widget _buildRegisterButton() {
+    final isLoading =
+        ref.watch(registrationProvider).status == RegistrationStatus.loading;
+
     return SizedBox(
       width: double.infinity,
       height: 52,
       child: ElevatedButton(
-        onPressed: _isLoading ? null : _onRegister,
+        onPressed: isLoading ? null : _onRegister,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primaryMedium,
@@ -269,7 +221,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
           ),
           elevation: 0,
         ),
-        child: _isLoading
+        child: isLoading
             ? const SizedBox(
                 width: 22,
                 height: 22,
