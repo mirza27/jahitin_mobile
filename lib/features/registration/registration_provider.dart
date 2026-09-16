@@ -5,12 +5,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jahitin_mobile/core/constants/storage_keys.dart';
 import 'package:jahitin_mobile/core/services/api_service.dart';
 import 'package:jahitin_mobile/core/services/storage_service.dart';
+import 'package:jahitin_mobile/features/auth/auth_provider.dart';
+import 'package:jahitin_mobile/features/auth/auth_state.dart';
 import 'package:jahitin_mobile/features/registration/registration_state.dart';
 import 'package:unique_device_identifier/unique_device_identifier.dart';
 
 final storageServiceProvider = Provider<StorageService>((ref) {
   return StorageService();
 });
+
+final authProvider = NotifierProvider<AuthNotifier, AuthState>(
+  AuthNotifier.new,
+);
 
 class RegistrationNotifier extends Notifier<RegistrationState> {
   @override
@@ -30,9 +36,13 @@ class RegistrationNotifier extends Notifier<RegistrationState> {
 
       await ApiService.registerLocal(name: name, deviceId: deviceId);
 
+      await storage.setDeviceId(deviceId);
       await storage.setAppState(StorageAppState.registered);
       await storage.setAuthType(StorageAuthType.local);
       await storage.setLoginStatus(StorageLoginStatus.loggedIn);
+
+      // directly login local
+      await ref.read(authProvider.notifier).loginLocal();
 
       state = const RegistrationState(status: RegistrationStatus.success);
       return true;

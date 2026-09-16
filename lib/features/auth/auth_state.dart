@@ -1,3 +1,5 @@
+import 'package:jahitin_mobile/core/models/user.dart';
+
 enum AuthStatus { initial, loading, unauthenticated, authenticated, error }
 
 enum AuthType { local, online }
@@ -5,27 +7,21 @@ enum AuthType { local, online }
 class AuthState {
   final AuthStatus status;
   final String? message;
-  final String? token;
-  final AuthType? authType;
+  final User? user;
 
-  const AuthState({
-    this.status = AuthStatus.initial,
-    this.message,
-    this.token,
-    this.authType,
-  });
+  const AuthState({this.status = AuthStatus.initial, this.message, this.user});
 
   AuthState copyWith({
     AuthStatus? status,
     String? message,
     String? token,
     AuthType? authType,
+    User? user,
   }) {
     return AuthState(
       status: status ?? this.status,
       message: message ?? this.message,
-      token: token ?? this.token,
-      authType: authType ?? this.authType,
+      user: user ?? this.user,
     );
   }
 }

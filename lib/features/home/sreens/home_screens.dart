@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
-
-class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
-
-  @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
+import '../home_provider.dart';
+import '../home_state.dart';
 
 /// Dummy order status shown on each card.
 enum _OrderStatus { diproses, belumMulai, selesai }
@@ -29,9 +24,8 @@ class _Order {
   });
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  // 0 = Aktif, 1 = Selesai
-  int _selectedTab = 0;
+class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
 
   static const List<_Order> _activeOrders = [
     _Order(
@@ -58,8 +52,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   static const List<_Order> _doneOrders = [];
 
   @override
-  Widget build(BuildContext context) {
-    final orders = _selectedTab == 0 ? _activeOrders : _doneOrders;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final homeState = ref.watch(homeProvider);
+    final orders =
+        homeState.selectedTab == HomeTab.active ? _activeOrders : _doneOrders;
 
     return Scaffold(
       backgroundColor: AppColors.primaryLight,
@@ -67,7 +63,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         bottom: false,
         child: Column(
           children: [
-            _buildHeader(),
+            _buildHeader(homeState),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
@@ -76,7 +72,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     _buildNewOrderButton(),
                     const SizedBox(height: 20),
-                    _buildTabs(),
+                    _buildTabs(ref, homeState.selectedTab),
                     const SizedBox(height: 20),
                     if (orders.isEmpty)
                       _buildEmptyState()
@@ -97,26 +93,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(HomeState homeState) {
     return Container(
       width: double.infinity,
       color: AppColors.surface,
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Halo, Bu Siti 👋',
-            style: TextStyle(
+            homeState.greetingText,
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           Text(
-            'Anda memiliki 2 pesanan aktif',
-            style: TextStyle(
+            homeState.activeOrderSummary,
+            style: const TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
             ),
@@ -153,24 +149,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildTabs() {
+  Widget _buildTabs(WidgetRef ref, HomeTab currentTab) {
     return Row(
       children: [
-        _buildTabChip('Aktif (${_activeOrders.length})', 0),
+        _buildTabChip(
+          label: 'Aktif (${_activeOrders.length})',
+          isSelected: currentTab == HomeTab.active,
+          onTap: () =>
+              ref.read(homeProvider.notifier).setTab(HomeTab.active),
+        ),
         const SizedBox(width: 12),
-        _buildTabChip('Selesai (${_doneOrders.length})', 1),
+        _buildTabChip(
+          label: 'Selesai (${_doneOrders.length})',
+          isSelected: currentTab == HomeTab.completed,
+          onTap: () =>
+              ref.read(homeProvider.notifier).setTab(HomeTab.completed),
+        ),
       ],
     );
   }
 
-  Widget _buildTabChip(String label, int index) {
-    final selected = _selectedTab == index;
+  Widget _buildTabChip({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
-      onTap: () => setState(() => _selectedTab = index),
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.surface,
+          color: isSelected ? AppColors.primary : AppColors.surface,
           borderRadius: BorderRadius.circular(24),
         ),
         child: Text(
@@ -178,7 +187,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: selected ? Colors.white : AppColors.textSecondary,
+            color: isSelected ? Colors.white : AppColors.textSecondary,
           ),
         ),
       ),

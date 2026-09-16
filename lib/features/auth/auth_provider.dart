@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jahitin_mobile/core/constants/storage_keys.dart';
+import 'package:jahitin_mobile/core/models/user.dart';
+import 'package:jahitin_mobile/core/services/api_service.dart';
 import 'package:jahitin_mobile/core/services/storage_service.dart';
 import 'package:jahitin_mobile/features/auth/auth_state.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -28,57 +30,78 @@ class AuthNotifier extends Notifier<AuthState> {
 
     // set provider state each time app is launched, based on storage data
     final storageAuthType = await storage.getAuthType();
-    final storageLoginStatus = await storage.getLoginStatus();
 
-    // local and logged in
-    if (storageAuthType == StorageAuthType.local &&
-        storageLoginStatus == StorageLoginStatus.loggedIn) {
-      state = state.copyWith(
-        status: AuthStatus.authenticated,
-        authType: AuthType.local,
-      );
+    // if online
+    if (storageAuthType == StorageAuthType.online) {
+      final isSessionValid = await checkSession();
 
-      // save token
-
-      return;
+      if (isSessionValid) {
+        state = state.copyWith(status: AuthStatus.authenticated);
+        return;
+      }
     }
 
-    // local and logged out
-    if (storageAuthType == StorageAuthType.local &&
-        storageLoginStatus == StorageLoginStatus.loggedOut) {
-      // process auth
-      state = state.copyWith(
-        status: AuthStatus.unauthenticated,
-        authType: AuthType.local,
-      );
-      return;
-    }
-
-    // online and logged in
-    if (storageAuthType == StorageAuthType.online &&
-        storageLoginStatus == StorageLoginStatus.loggedIn) {
-      state = state.copyWith(
-        status: AuthStatus.authenticated,
-        authType: AuthType.online,
-      );
-      return;
-    }
-
-    // online and logged out
-    if (storageAuthType == StorageAuthType.online &&
-        storageLoginStatus == StorageLoginStatus.loggedOut) {
-      state = state.copyWith(
-        status: AuthStatus.unauthenticated,
-        authType: AuthType.online,
-      );
-
+    // if local then just auto relogin and update token
+    if (storageAuthType == StorageAuthType.local) {
+      await loginLocal();
+      state = state.copyWith(status: AuthStatus.authenticated);
       return;
     }
 
     state = state.copyWith(status: AuthStatus.unauthenticated);
   }
 
-  Future<bool> login({required String email, required String password}) async {
+  Future<bool> checkSession() async {
+    state = state.copyWith(status: AuthStatus.loading);
+
+    final storage = ref.read(storageServiceProvider);
+    final String? storageToken = await storage.getToken();
+
+    if (storageToken != null && storageToken.isNotEmpty) {
+      // if response from API is valid, return true
+      final result = await ApiService.userSession(token: storageToken);
+
+      state = state.copyWith(
+        user: result['data'] != null ? User.fromJson(result['data']) : null,
+      );
+
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<void> getUserData() async {
+    state = state.copyWith(status: AuthStatus.loading);
+
+    final storage = ref.read(storageServiceProvider);
+    final String? storageToken = await storage.getToken();
+
+    final result = await ApiService.userSession(token: storageToken!);
+    state = state.copyWith(
+      user: result['data'] != null ? User.fromJson(result['data']) : null,
+    );
+  }
+
+  Future<void> loginLocal() async {
+    final storage = ref.read(storageServiceProvider);
+    final deviceId = await storage.getDeviceId();
+
+    final result = await ApiService.loginLocal(deviceId: deviceId!);
+    final token = result['data']['token'];
+
+    await storage.setToken(token);
+
+    // set user data
+    await getUserData();
+
+    return;
+  }
+
+  Future<bool> loginAccount({
+    required String email,
+    required String password,
+  }) async {
     state = state.copyWith(status: AuthStatus.loading);
 
     try {
