@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../create_order/presentation/create_order/screen/create_order_screen.dart';
 import '../home_provider.dart';
 import '../home_state.dart';
 
@@ -43,9 +44,7 @@ class HomeScreen extends ConsumerWidget {
       jobCount: 1,
       dateLabel: 'Rab, 8 Jul',
       status: _OrderStatus.belumMulai,
-      jobs: [
-        'Jas - Jahit baru (untuk Pak Budi)',
-      ],
+      jobs: ['Jas - Jahit baru (untuk Pak Budi)'],
     ),
   ];
 
@@ -54,8 +53,9 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homeProvider);
-    final orders =
-        homeState.selectedTab == HomeTab.active ? _activeOrders : _doneOrders;
+    final orders = homeState.selectedTab == HomeTab.active
+        ? _activeOrders
+        : _doneOrders;
 
     return Scaffold(
       backgroundColor: AppColors.primaryLight,
@@ -70,7 +70,7 @@ class HomeScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildNewOrderButton(),
+                    _buildNewOrderButton(context),
                     const SizedBox(height: 20),
                     _buildTabs(ref, homeState.selectedTab),
                     const SizedBox(height: 20),
@@ -122,12 +122,16 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNewOrderButton() {
+  Widget _buildNewOrderButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton.icon(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const CreateOrderScreen()),
+          );
+        },
         icon: const Icon(Icons.add, size: 22, color: Colors.white),
         label: const Text(
           'Pesanan Baru',
@@ -155,8 +159,7 @@ class HomeScreen extends ConsumerWidget {
         _buildTabChip(
           label: 'Aktif (${_activeOrders.length})',
           isSelected: currentTab == HomeTab.active,
-          onTap: () =>
-              ref.read(homeProvider.notifier).setTab(HomeTab.active),
+          onTap: () => ref.read(homeProvider.notifier).setTab(HomeTab.active),
         ),
         const SizedBox(width: 12),
         _buildTabChip(
@@ -281,11 +284,7 @@ class HomeScreen extends ConsumerWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: fg,
-        ),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: fg),
       ),
     );
   }
@@ -324,18 +323,11 @@ class HomeScreen extends ConsumerWidget {
       child: Center(
         child: Column(
           children: [
-            Icon(
-              Icons.inbox_outlined,
-              size: 48,
-              color: AppColors.textHint,
-            ),
+            Icon(Icons.inbox_outlined, size: 48, color: AppColors.textHint),
             const SizedBox(height: 12),
             const Text(
               'Belum ada pesanan selesai',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
             ),
           ],
         ),

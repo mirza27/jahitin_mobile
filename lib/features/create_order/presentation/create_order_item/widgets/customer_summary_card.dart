@@ -1,0 +1,147 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/models/customer.dart';
+
+class CustomerSummaryCard extends StatelessWidget {
+  final Customer? customer;
+  final DateTime? deadline;
+  final String orderNotes;
+  final VoidCallback? onEditStep1;
+
+  const CustomerSummaryCard({
+    super.key,
+    required this.customer,
+    required this.deadline,
+    required this.orderNotes,
+    this.onEditStep1,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final deadlineFormatted = deadline != null
+        ? DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(deadline!)
+        : '-';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: AppColors.primaryLight,
+                    radius: 18,
+                    child: Text(
+                      customer != null && customer!.name.isNotEmpty
+                          ? customer!.name[0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        customer?.name ?? 'Tanpa Pelanggan',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      if (customer?.phone != null)
+                        Text(
+                          customer!.phone,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+              if (onEditStep1 != null)
+                IconButton(
+                  icon: const Icon(
+                    Icons.edit_outlined,
+                    size: 20,
+                    color: AppColors.primary,
+                  ),
+                  onPressed: onEditStep1,
+                  tooltip: 'Ubah Data Pelanggan & Target',
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: AppColors.divider),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Icon(
+                Icons.calendar_today_outlined,
+                size: 16,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Target Selesai: ',
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              ),
+              Expanded(
+                child: Text(
+                  deadlineFormatted,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (orderNotes.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.note_alt_outlined,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    orderNotes,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
