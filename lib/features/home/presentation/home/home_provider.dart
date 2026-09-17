@@ -6,10 +6,6 @@ import 'package:jahitin_mobile/features/auth/auth_state.dart';
 import 'package:jahitin_mobile/features/home/presentation/home/home_state.dart';
 import 'package:jahitin_mobile/features/home/model/order_display.dart';
 
-final orderApiProvider = Provider<OrderApi>((ref) {
-  return OrderApi();
-});
-
 class HomeNotifier extends Notifier<HomeState> {
   @override
   HomeState build() {

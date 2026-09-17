@@ -101,24 +101,41 @@ class _OrderSearchScreenState extends ConsumerState<OrderSearchScreen> {
                     fontSize: 13,
                     color: AppColors.textHint,
                   ),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: AppColors.textSecondary,
-                    size: 20,
-                  ),
                   suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(
-                            Icons.close,
-                            color: AppColors.textSecondary,
-                            size: 18,
-                          ),
-                          onPressed: _clearSearch,
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.close,
+                                color: AppColors.textSecondary,
+                                size: 18,
+                              ),
+                              onPressed: _clearSearch,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 4, right: 12),
+                              child: Icon(
+                                Icons.search,
+                                color: AppColors.textSecondary,
+                                size: 20,
+                              ),
+                            ),
+                          ],
                         )
-                      : null,
+                      : const Padding(
+                          padding: EdgeInsets.only(right: 4),
+                          child: Icon(
+                            Icons.search,
+                            color: AppColors.textSecondary,
+                            size: 20,
+                          ),
+                        ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: 14,
                     vertical: 12,
                   ),
                 ),
