@@ -52,6 +52,7 @@ class HomeScreen extends ConsumerWidget {
                             homeState.selectedTab,
                             activeCount: homeState.activeOrders.length,
                             completedCount: homeState.completedOrders.length,
+                            allCount: homeState.orderList.length,
                           ),
                           const SizedBox(height: 12),
                           if (homeState.status == HomeStatus.loading &&
@@ -186,6 +187,7 @@ class HomeScreen extends ConsumerWidget {
     HomeTab currentTab, {
     required int activeCount,
     required int completedCount,
+    required int allCount,
   }) {
     return Row(
       children: [
@@ -200,6 +202,12 @@ class HomeScreen extends ConsumerWidget {
           isSelected: currentTab == HomeTab.completed,
           onTap: () =>
               ref.read(homeProvider.notifier).setTab(HomeTab.completed),
+        ),
+        const SizedBox(width: 8),
+        _buildTabChip(
+          label: 'Semua ($allCount)',
+          isSelected: currentTab == HomeTab.all,
+          onTap: () => ref.read(homeProvider.notifier).setTab(HomeTab.all),
         ),
       ],
     );
@@ -455,7 +463,19 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(HomeTab tab) {
-    final isTabActive = tab == HomeTab.active;
+    String emptyMessage;
+    switch (tab) {
+      case HomeTab.active:
+        emptyMessage = 'Belum ada pesanan aktif';
+        break;
+      case HomeTab.completed:
+        emptyMessage = 'Belum ada pesanan selesai';
+        break;
+      case HomeTab.all:
+        emptyMessage = 'Belum ada pesanan';
+        break;
+    }
+
     return Padding(
       padding: const EdgeInsets.only(top: 60),
       child: Center(
@@ -468,9 +488,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              isTabActive
-                  ? 'Belum ada pesanan aktif'
-                  : 'Belum ada pesanan selesai',
+              emptyMessage,
               style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,

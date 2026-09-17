@@ -5,6 +5,7 @@ import '../../../../../core/constants/app_colors.dart';
 import '../../../model/detail_order.dart';
 import '../detail_order_provider.dart';
 import '../detail_order_state.dart';
+import '../../update_order/screens/update_order_screen.dart';
 
 class DetailOrderScreen extends ConsumerWidget {
   const DetailOrderScreen({super.key, required this.orderId});
@@ -44,7 +45,7 @@ class DetailOrderScreen extends ConsumerWidget {
       bottomNavigationBar:
           (detailState.status == DetailOrderStatus.loaded &&
                   detailState.detailOrder != null)
-              ? _buildBottomBar(context)
+              ? _buildBottomBar(context, ref, detailState.detailOrder!)
               : null,
     );
   }
@@ -562,7 +563,11 @@ class DetailOrderScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBottomBar(BuildContext context) {
+  Widget _buildBottomBar(
+    BuildContext context,
+    WidgetRef ref,
+    DetailOrder detailOrder,
+  ) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       decoration: BoxDecoration(
@@ -580,8 +585,19 @@ class DetailOrderScreen extends ConsumerWidget {
           width: double.infinity,
           height: 48,
           child: OutlinedButton.icon(
-            onPressed: () {
-              // Action for edit order
+            onPressed: () async {
+              final result = await Navigator.of(context).push<bool>(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      UpdateOrderScreen(detailOrder: detailOrder),
+                ),
+              );
+
+              if (result == true) {
+                ref
+                    .read(detailOrderProvider(orderId).notifier)
+                    .fetchDetailOrder(orderId);
+              }
             },
             icon: const Icon(
               Icons.edit_outlined,

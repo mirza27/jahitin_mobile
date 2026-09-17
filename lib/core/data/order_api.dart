@@ -107,6 +107,44 @@ class OrderApi {
         'Gagal mengambil detail order (${response.statusCode})';
     throw ApiException(message, statusCode: response.statusCode);
   }
+
+  /// Mengupdate data order secara penuh (/order/update/:order_id).
+  Future<Map<String, dynamic>> updateOrder(
+    String orderId,
+    Map<String, dynamic> payload, {
+    String? token,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/order/update/$orderId');
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+
+    final response = await _client
+        .put(
+          uri,
+          headers: headers,
+          body: jsonEncode(payload),
+        )
+        .timeout(const Duration(seconds: 15));
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      final body = response.body.isNotEmpty ? jsonDecode(response.body) : {};
+      if (body is Map<String, dynamic>) {
+        return body;
+      }
+      return {};
+    }
+
+    final body = response.body.isNotEmpty
+        ? jsonDecode(response.body) as Map<String, dynamic>
+        : <String, dynamic>{};
+    final message =
+        body['message'] as String? ??
+        body['error'] as String? ??
+        'Gagal memperbarui pesanan (${response.statusCode})';
+    throw ApiException(message, statusCode: response.statusCode);
+  }
 }
 
 final orderApiProvider = Provider<OrderApi>((ref) {

@@ -3,7 +3,7 @@ import 'package:jahitin_mobile/features/home/model/order_display.dart';
 
 enum HomeStatus { initial, loading, loaded, error }
 
-enum HomeTab { active, completed }
+enum HomeTab { active, completed, all }
 
 class HomeState {
   final HomeStatus status;
@@ -49,8 +49,16 @@ class HomeState {
       .toList();
 
   /// Daftar pesanan yang ditampilkan sesuai tab yang dipilih.
-  List<OrderDisplay> get displayedOrders =>
-      selectedTab == HomeTab.active ? activeOrders : completedOrders;
+  List<OrderDisplay> get displayedOrders {
+    switch (selectedTab) {
+      case HomeTab.active:
+        return activeOrders;
+      case HomeTab.completed:
+        return completedOrders;
+      case HomeTab.all:
+        return orderList;
+    }
+  }
 
   /// Teks subtitle berisi jumlah pesanan aktif.
   String get activeOrderSummary =>
