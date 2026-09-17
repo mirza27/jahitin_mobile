@@ -16,16 +16,23 @@ class OrderSearchNotifier extends Notifier<OrderSearchState> {
     return const OrderSearchState(
       status: OrderSearchStatus.initial,
       searchQuery: '',
+      statusFilter: OrderStatusFilter.all,
       orderList: [],
     );
   }
 
-  Future<void> fetchOrders(String query) async {
+  Future<void> fetchOrders(
+    String query, {
+    OrderStatusFilter? statusFilter,
+  }) async {
+    final targetFilter = statusFilter ?? state.statusFilter;
     final trimmed = query.trim();
+
     if (trimmed.isEmpty) {
       state = state.copyWith(
         status: OrderSearchStatus.initial,
         searchQuery: '',
+        statusFilter: targetFilter,
         orderList: [],
         message: null,
       );
@@ -45,6 +52,7 @@ class OrderSearchNotifier extends Notifier<OrderSearchState> {
     state = state.copyWith(
       status: OrderSearchStatus.loading,
       searchQuery: trimmed,
+      statusFilter: targetFilter,
     );
 
     try {
@@ -55,6 +63,7 @@ class OrderSearchNotifier extends Notifier<OrderSearchState> {
       final rawOrders = await orderApi.getUserOrders(
         token: token,
         search: trimmed,
+        status: targetFilter.apiValue,
       );
 
       final searchResults = rawOrders
@@ -73,10 +82,19 @@ class OrderSearchNotifier extends Notifier<OrderSearchState> {
     }
   }
 
+  void setStatusFilter(OrderStatusFilter filter) {
+    if (state.statusFilter == filter) return;
+    state = state.copyWith(statusFilter: filter);
+    if (state.searchQuery != null && state.searchQuery!.isNotEmpty) {
+      fetchOrders(state.searchQuery!, statusFilter: filter);
+    }
+  }
+
   void clearSearch() {
     state = const OrderSearchState(
       status: OrderSearchStatus.initial,
       searchQuery: '',
+      statusFilter: OrderStatusFilter.all,
       orderList: [],
     );
   }
