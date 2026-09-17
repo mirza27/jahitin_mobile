@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../create_order/presentation/create_order/screen/create_order_screen.dart';
+import '../../../../detail_order/presentation/detail_order/screen/detail_order_screen.dart';
 import '../../../widgets/config_sidebar.dart';
 import '../../order_search/screens/order_search_screen.dart';
 import '../home_provider.dart';
@@ -65,7 +66,7 @@ class HomeScreen extends ConsumerWidget {
                             ...displayedOrders.map(
                               (order) => Padding(
                                 padding: const EdgeInsets.only(bottom: 12),
-                                child: _buildOrderCard(order),
+                                child: _buildOrderCard(context, order),
                               ),
                             ),
                         ],
@@ -229,79 +230,89 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildOrderCard(OrderDisplay order) {
+  Widget _buildOrderCard(BuildContext context, OrderDisplay order) {
     final deadlineText = _formatDeadline(order.deadline);
     final items = order.orderDisplayItems ?? [];
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  order.customerName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => DetailOrderScreen(orderId: order.orderId),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    order.customerName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
-              ),
-              _buildStatusChip(order.orderStatus),
-            ],
-          ),
-          const SizedBox(height: 2),
-          Text(
-            '${order.itemCount} pekerjaan',
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.textSecondary,
+                _buildStatusChip(order.orderStatus),
+              ],
             ),
-          ),
-          if (deadlineText != null) ...[
-            const SizedBox(height: 10),
-            _buildDateChip(deadlineText, order.orderStatus),
-          ],
-          if (items.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            ...items.map((item) {
-              final itemLabel = _getItemDescription(item);
-              return Padding(
+            const SizedBox(height: 2),
+            Text(
+              '${order.itemCount} pekerjaan',
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            if (deadlineText != null) ...[
+              const SizedBox(height: 10),
+              _buildDateChip(deadlineText, order.orderStatus),
+            ],
+            if (items.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              ...items.map((item) {
+                final itemLabel = _getItemDescription(item);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    '• $itemLabel',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                      height: 1.3,
+                    ),
+                  ),
+                );
+              }),
+            ] else if (order.name != null && order.name!.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Text(
-                  '• $itemLabel',
+                  '• ${order.name}',
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                     height: 1.3,
                   ),
                 ),
-              );
-            }),
-          ] else if (order.name != null && order.name!.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(
-                '• ${order.name}',
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                  height: 1.3,
-                ),
               ),
-            ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

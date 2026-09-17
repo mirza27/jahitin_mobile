@@ -1,8 +1,7 @@
 import 'dart:convert';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-
 import '../services/api_service.dart';
 
 class OrderApi {
@@ -14,7 +13,7 @@ class OrderApi {
       dotenv.env['API_URL'] ??
       (throw const ApiException('API_URL tidak ditemukan di .env'));
 
-  Future<Map<String, dynamic>> createOrder() async {
+  Future<Map<String, dynamic>> createUserOrder() async {
     return {};
   }
 
@@ -77,7 +76,39 @@ class OrderApi {
     throw ApiException(message, statusCode: response.statusCode);
   }
 
-  Future<Map<String, dynamic>> getOrderDetail(String orderId) async {
-    return {};
+  Future<Map<String, dynamic>> getUserOrderDetail(
+    String orderId, {
+    String? token,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/order/detail/$orderId');
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+
+    final response = await _client
+        .get(uri, headers: headers)
+        .timeout(const Duration(seconds: 15));
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      final body = jsonDecode(response.body);
+      if (body is Map<String, dynamic> && body['data'] is Map) {
+        return Map<String, dynamic>.from(body['data'] as Map);
+      }
+      return {};
+    }
+
+    final body = response.body.isNotEmpty
+        ? jsonDecode(response.body) as Map<String, dynamic>
+        : <String, dynamic>{};
+    final message =
+        body['message'] as String? ??
+        body['error'] as String? ??
+        'Gagal mengambil detail order (${response.statusCode})';
+    throw ApiException(message, statusCode: response.statusCode);
   }
 }
+
+final orderApiProvider = Provider<OrderApi>((ref) {
+  return OrderApi();
+});
