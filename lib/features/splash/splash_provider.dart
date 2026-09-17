@@ -4,10 +4,6 @@ import 'package:jahitin_mobile/core/constants/storage_keys.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jahitin_mobile/features/splash/splash_state.dart';
 
-final storageServiceProvider = Provider<StorageService>((ref) {
-  return StorageService();
-});
-
 class SplashNotifier extends Notifier<SplashState> {
   @override
   SplashState build() {
@@ -29,6 +25,8 @@ class SplashNotifier extends Notifier<SplashState> {
     state = state.copyWith(status: SplashStatus.loading);
 
     final storageAppState = await storage.getAppState();
+
+    await storage.setDeviceId('bocil');
 
     // check version and API for update, if needed
     // ...

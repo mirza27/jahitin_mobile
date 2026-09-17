@@ -1,6 +1,11 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:unique_device_identifier/unique_device_identifier.dart';
 import '../constants/storage_keys.dart';
+
+final storageServiceProvider = Provider<StorageService>((ref) {
+  return StorageService();
+});
 
 class StorageService {
   static const _storage = FlutterSecureStorage();

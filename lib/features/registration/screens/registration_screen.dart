@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jahitin_mobile/features/home/sreens/home_screens.dart';
+import 'package:jahitin_mobile/features/home/presentation/home/screens/home_screens.dart';
 import 'package:jahitin_mobile/features/registration/registration_provider.dart';
 import 'package:jahitin_mobile/features/registration/registration_state.dart';
 import '../../../core/constants/app_colors.dart';

@@ -6,17 +6,8 @@ import 'package:jahitin_mobile/core/constants/storage_keys.dart';
 import 'package:jahitin_mobile/core/services/api_service.dart';
 import 'package:jahitin_mobile/core/services/storage_service.dart';
 import 'package:jahitin_mobile/features/auth/auth_provider.dart';
-import 'package:jahitin_mobile/features/auth/auth_state.dart';
 import 'package:jahitin_mobile/features/registration/registration_state.dart';
 import 'package:unique_device_identifier/unique_device_identifier.dart';
-
-final storageServiceProvider = Provider<StorageService>((ref) {
-  return StorageService();
-});
-
-final authProvider = NotifierProvider<AuthNotifier, AuthState>(
-  AuthNotifier.new,
-);
 
 class RegistrationNotifier extends Notifier<RegistrationState> {
   @override

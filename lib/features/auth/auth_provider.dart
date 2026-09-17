@@ -6,10 +6,6 @@ import 'package:jahitin_mobile/core/services/storage_service.dart';
 import 'package:jahitin_mobile/features/auth/auth_state.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-final storageServiceProvider = Provider<StorageService>((ref) {
-  return StorageService();
-});
-
 class AuthNotifier extends Notifier<AuthState> {
   @override
   AuthState build() {
