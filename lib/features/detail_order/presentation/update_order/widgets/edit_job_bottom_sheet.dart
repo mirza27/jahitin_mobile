@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../../../core/constants/app_colors.dart';
+import '../../../../../../core/localization/app_localizations_ext.dart';
 import '../../../model/update_detail_order.dart';
 
 class EditJobBottomSheet extends StatefulWidget {
@@ -180,7 +181,7 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  isEdit ? 'Edit Pekerjaan' : 'Tambah Pekerjaan',
+                  isEdit ? context.tr('edit_job') : context.tr('add_job'),
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -205,9 +206,9 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. Jenis Barang (Text field & Kategori picker)
-                  const Text(
-                    'Jenis Barang',
-                    style: TextStyle(
+                  Text(
+                    context.tr('garment_type_title'),
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -217,7 +218,7 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                   TextField(
                     controller: _clothesCategoryController,
                     decoration: InputDecoration(
-                      hintText: 'Contoh: Gamis, Celana, Baju Anak...',
+                      hintText: context.tr('garment_type_hint'),
                       hintStyle: const TextStyle(
                         fontSize: 14,
                         color: AppColors.textHint,
@@ -294,23 +295,23 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                   const SizedBox(height: 20),
 
                   // 2. Jenis Pekerjaan (Chips)
-                  const Text(
-                    'Jenis Pekerjaan',
-                    style: TextStyle(
+                  Text(
+                    context.tr('job_type_title'),
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  _buildServiceChips(),
+                  _buildServiceChips(context),
 
                   if (_isCustomService) ...[
                     const SizedBox(height: 10),
                     TextField(
                       controller: _customServiceController,
                       decoration: InputDecoration(
-                        hintText: 'Tuliskan jenis pekerjaan...',
+                        hintText: context.tr('custom_job_hint'),
                         hintStyle: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textHint,
@@ -343,9 +344,9 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                   const SizedBox(height: 20),
 
                   // 3. Untuk Siapa
-                  const Text(
-                    'Untuk Siapa (Opsional)',
-                    style: TextStyle(
+                  Text(
+                    context.tr('recipient_optional_title'),
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -355,7 +356,7 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                   TextField(
                     controller: _clothesForController,
                     decoration: InputDecoration(
-                      hintText: 'Nama penerima pakaian (contoh: Bu Siti)',
+                      hintText: context.tr('recipient_optional_hint'),
                       hintStyle: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textHint,
@@ -387,9 +388,9 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                   const SizedBox(height: 20),
 
                   // 4. Catatan (Opsional)
-                  const Text(
-                    'Catatan (Opsional)',
-                    style: TextStyle(
+                  Text(
+                    context.tr('notes_optional_title'),
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -400,7 +401,7 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                     controller: _notesController,
                     maxLines: 3,
                     decoration: InputDecoration(
-                      hintText: 'Misalnya: Resleting putih, hati-hati kain, dll',
+                      hintText: context.tr('notes_optional_hint'),
                       hintStyle: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textHint,
@@ -432,9 +433,9 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                   const SizedBox(height: 20),
 
                   // 5. Biaya (Opsional)
-                  const Text(
-                    'Biaya (Opsional)',
-                    style: TextStyle(
+                  Text(
+                    context.tr('cost_optional_title'),
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -503,7 +504,9 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                       ),
                       onPressed: _save,
                       child: Text(
-                        isEdit ? 'Update Pekerjaan' : 'Tambah Pekerjaan',
+                        isEdit
+                            ? context.tr('btn_update_job')
+                            : context.tr('btn_save_job'),
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -521,38 +524,38 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
     );
   }
 
-  Widget _buildServiceChips() {
+  Widget _buildServiceChips(BuildContext context) {
     // Default fallback list jika API belum me-load
     final fallbackServices = [
-      'Jahit baru',
-      'Kecilkan',
-      'Besarkan',
-      'Pendekkan',
-      'Ganti resleting',
-      'Obras',
-      'Tambal',
-      'Lainnya',
+      {'key': 'service_new_tailoring', 'name': 'Jahit baru'},
+      {'key': 'service_taper_in', 'name': 'Kecilkan'},
+      {'key': 'service_let_out', 'name': 'Besarkan'},
+      {'key': 'service_shorten', 'name': 'Pendekkan'},
+      {'key': 'service_replace_zipper', 'name': 'Ganti resleting'},
+      {'key': 'service_overlock', 'name': 'Obras'},
+      {'key': 'service_patch', 'name': 'Tambal'},
+      {'key': 'category_other', 'name': 'Lainnya'},
     ];
 
     if (widget.serviceTypes.isEmpty) {
       return Wrap(
         spacing: 8,
         runSpacing: 8,
-        children: fallbackServices.map((label) {
-          final isLainnya = label == 'Lainnya';
+        children: fallbackServices.map((item) {
+          final isLainnya = item['name'] == 'Lainnya';
           final isSelected = isLainnya
               ? _isCustomService
               : (!_isCustomService &&
-                  _selectedServiceName?.toLowerCase() == label.toLowerCase());
+                  _selectedServiceName?.toLowerCase() == item['name']!.toLowerCase());
           return _buildChip(
-            label: label,
+            label: context.tr(item['key']!),
             isSelected: isSelected,
             onTap: () {
               if (isLainnya) {
                 _onSelectLainnyaService();
               } else {
                 setState(() {
-                  _selectedServiceName = label;
+                  _selectedServiceName = item['name'];
                   _isCustomService = false;
                   _customServiceController.clear();
                 });
@@ -582,7 +585,7 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
         }),
         if (!hasLainnya)
           _buildChip(
-            label: 'Lainnya',
+            label: context.tr('category_other'),
             isSelected: _isCustomService,
             onTap: _onSelectLainnyaService,
           ),

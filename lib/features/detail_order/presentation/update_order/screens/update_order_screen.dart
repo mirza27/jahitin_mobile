@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../model/detail_order.dart';
 import '../update_order_provider.dart';
 import '../update_order_state.dart';
@@ -93,7 +94,7 @@ class UpdateOrderScreen extends ConsumerWidget {
               if (deadlineText != null) ...[
                 const SizedBox(height: 2),
                 Text(
-                  'Deadline: $deadlineText',
+                  context.tr('deadline_prefix', params: {'deadline': deadlineText}),
                   style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.normal,
@@ -126,9 +127,9 @@ class UpdateOrderScreen extends ConsumerWidget {
                     }
                   },
                   icon: const Icon(Icons.add, size: 20, color: Colors.white),
-                  label: const Text(
-                    'Tambah Pekerjaan',
-                    style: TextStyle(
+                  label: Text(
+                    context.tr('btn_add_job'),
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -154,10 +155,10 @@ class UpdateOrderScreen extends ConsumerWidget {
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
-                      'Belum ada pekerjaan ditambahkan',
-                      style: TextStyle(
+                      context.tr('empty_jobs_added'),
+                      style: const TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 14,
                       ),
@@ -231,8 +232,8 @@ class UpdateOrderScreen extends ConsumerWidget {
                     final success = await notifier.submitUpdate();
                     if (success && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Pesanan berhasil diperbarui'),
+                        SnackBar(
+                          content: Text(context.tr('order_updated_success')),
                           backgroundColor: AppColors.success,
                         ),
                       );
@@ -255,9 +256,9 @@ class UpdateOrderScreen extends ConsumerWidget {
                       color: Colors.white,
                     ),
                   )
-                : const Text(
-                    'Simpan Pesanan',
-                    style: TextStyle(
+                : Text(
+                    context.tr('btn_save_order'),
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,

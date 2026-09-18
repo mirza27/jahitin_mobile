@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../model/detail_order.dart';
 import '../detail_order_provider.dart';
 import '../detail_order_state.dart';
@@ -19,7 +20,7 @@ class DetailOrderScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.primaryLight,
       appBar: AppBar(
-        title: _buildAppBarTitle(detailState),
+        title: _buildAppBarTitle(context, detailState),
         centerTitle: false,
         backgroundColor: AppColors.surface,
         elevation: 0,
@@ -30,7 +31,7 @@ class DetailOrderScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(right: 16),
               child: Center(
-                child: _buildStatusChip(detailState.detailOrder!.status),
+                child: _buildStatusChip(context, detailState.detailOrder!.status),
               ),
             ),
         ],
@@ -50,7 +51,7 @@ class DetailOrderScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAppBarTitle(DetailOrderState state) {
+  Widget _buildAppBarTitle(BuildContext context, DetailOrderState state) {
     if (state.status == DetailOrderStatus.loaded &&
         state.detailOrder != null) {
       final order = state.detailOrder!;
@@ -70,7 +71,10 @@ class DetailOrderScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            '${order.items.length} pekerjaan',
+            context.tr(
+              'job_count',
+              params: {'count': '${order.items.length}'},
+            ),
             style: const TextStyle(
               color: AppColors.textSecondary,
               fontWeight: FontWeight.normal,
@@ -81,9 +85,9 @@ class DetailOrderScreen extends ConsumerWidget {
       );
     }
 
-    return const Text(
-      'Detail Order',
-      style: TextStyle(
+    return Text(
+      context.tr('order_detail'),
+      style: const TextStyle(
         color: AppColors.textPrimary,
         fontWeight: FontWeight.bold,
         fontSize: 18,
@@ -103,16 +107,16 @@ class DetailOrderScreen extends ConsumerWidget {
           child: CircularProgressIndicator(color: AppColors.primary),
         );
       case DetailOrderStatus.error:
-        return _buildErrorState(ref, state.message);
+        return _buildErrorState(context, ref, state.message);
       case DetailOrderStatus.loaded:
         if (state.detailOrder == null) {
-          return _buildEmptyState();
+          return _buildEmptyState(context);
         }
         return _buildContent(context, state.detailOrder!);
     }
   }
 
-  Widget _buildErrorState(WidgetRef ref, String? message) {
+  Widget _buildErrorState(BuildContext context, WidgetRef ref, String? message) {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       child: Container(
@@ -125,7 +129,7 @@ class DetailOrderScreen extends ConsumerWidget {
             const Icon(Icons.error_outline, size: 56, color: AppColors.error),
             const SizedBox(height: 12),
             Text(
-              message ?? 'Gagal memuat detail order',
+              message ?? context.tr('error_load_detail'),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 14,
@@ -149,9 +153,9 @@ class DetailOrderScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text(
-                'Coba Lagi',
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                context.tr('retry'),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ],
@@ -160,21 +164,21 @@ class DetailOrderScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       child: Container(
         height: 400,
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.inbox_outlined, size: 56, color: AppColors.textHint),
-            SizedBox(height: 12),
+            const Icon(Icons.inbox_outlined, size: 56, color: AppColors.textHint),
+            const SizedBox(height: 12),
             Text(
-              'Detail order tidak ditemukan',
-              style: TextStyle(
+              context.tr('detail_not_found'),
+              style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -193,16 +197,16 @@ class DetailOrderScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildOrderHeaderCard(order),
+          _buildOrderHeaderCard(context, order),
           const SizedBox(height: 16),
-          _buildJobListSection(order.items),
+          _buildJobListSection(context, order.items),
           const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  Widget _buildOrderHeaderCard(DetailOrder order) {
+  Widget _buildOrderHeaderCard(BuildContext context, DetailOrder order) {
     final deadlineText = _formatDeadline(order.deadline);
 
     final completedCount = order.items.where((item) {
@@ -227,9 +231,9 @@ class DetailOrderScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Customer Name
-          const Text(
-            'Nama Pelanggan',
-            style: TextStyle(
+          Text(
+            context.tr('customer_name_label'),
+            style: const TextStyle(
               fontSize: 13,
               color: AppColors.textSecondary,
             ),
@@ -248,9 +252,9 @@ class DetailOrderScreen extends ConsumerWidget {
           if (order.customerPhone != null &&
               order.customerPhone!.isNotEmpty) ...[
             const SizedBox(height: 12),
-            const Text(
-              'No HP',
-              style: TextStyle(
+            Text(
+              context.tr('phone_label'),
+              style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,
               ),
@@ -269,9 +273,9 @@ class DetailOrderScreen extends ConsumerWidget {
           // Deadline
           if (deadlineText != null) ...[
             const SizedBox(height: 12),
-            const Text(
-              'Deadline',
-              style: TextStyle(
+            Text(
+              context.tr('deadline'),
+              style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,
               ),
@@ -296,9 +300,9 @@ class DetailOrderScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Total Pekerjaan',
-                style: TextStyle(
+              Text(
+                context.tr('total_jobs_label'),
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                 ),
@@ -319,9 +323,9 @@ class DetailOrderScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Selesai',
-                style: TextStyle(
+              Text(
+                context.tr('completed_jobs_label'),
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                 ),
@@ -346,9 +350,9 @@ class DetailOrderScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Total Biaya',
-                style: TextStyle(
+              Text(
+                context.tr('total_cost'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -369,13 +373,13 @@ class DetailOrderScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildJobListSection(List<DetailOrderItem> items) {
+  Widget _buildJobListSection(BuildContext context, List<DetailOrderItem> items) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Daftar Pekerjaan',
-          style: TextStyle(
+        Text(
+          context.tr('job_list'),
+          style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -390,27 +394,27 @@ class DetailOrderScreen extends ConsumerWidget {
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Text(
-              'Tidak ada item pekerjaan',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            child: Text(
+              context.tr('no_job_items'),
+              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
             ),
           )
         else
           ...items.asMap().entries.map(
             (entry) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: _buildJobItemCard(entry.value, entry.key),
+              child: _buildJobItemCard(context, entry.value, entry.key),
             ),
           ),
       ],
     );
   }
 
-  Widget _buildJobItemCard(DetailOrderItem item, int index) {
+  Widget _buildJobItemCard(BuildContext context, DetailOrderItem item, int index) {
     final clothesTitle =
         (item.clothesFor != null && item.clothesFor!.isNotEmpty)
         ? item.clothesFor!
-        : (item.clothesCategoryName ?? 'Pakaian');
+        : (item.clothesCategoryName ?? context.tr('default_garment_fallback'));
 
     final serviceType =
         (item.customServiceName != null && item.customServiceName!.isNotEmpty)
@@ -446,7 +450,7 @@ class DetailOrderScreen extends ConsumerWidget {
                 ),
               ),
               if (item.status != null && item.status!.isNotEmpty)
-                _buildStatusChip(item.status!),
+                _buildStatusChip(context, item.status!),
             ],
           ),
           const SizedBox(height: 6),
@@ -483,9 +487,9 @@ class DetailOrderScreen extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 6),
               child: Row(
                 children: [
-                  const Text(
-                    'Untuk: ',
-                    style: TextStyle(
+                  Text(
+                    '${context.tr('for_recipient_prefix', params: {'name': ''}).replaceAll('{name}', '')} ',
+                    style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.textSecondary,
                     ),
@@ -508,9 +512,9 @@ class DetailOrderScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Biaya',
-                style: TextStyle(
+              Text(
+                context.tr('price_label'),
+                style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.textSecondary,
                 ),
@@ -604,9 +608,9 @@ class DetailOrderScreen extends ConsumerWidget {
               size: 18,
               color: AppColors.textPrimary,
             ),
-            label: const Text(
-              'Edit Pesanan',
-              style: TextStyle(
+            label: Text(
+              context.tr('btn_edit_order'),
+              style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -627,7 +631,7 @@ class DetailOrderScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusChip(String status) {
+  Widget _buildStatusChip(BuildContext context, String status) {
     final normalized = status.trim().toLowerCase().replaceAll('_', '');
     Color bgColor;
     Color textColor;
@@ -637,19 +641,25 @@ class DetailOrderScreen extends ConsumerWidget {
       case 'inprogress':
         bgColor = AppColors.statusProcessed;
         textColor = AppColors.statusProcessedText;
-        label = 'Diproses';
+        label = context.tr('status_processed');
         break;
       case 'completed':
       case 'selesai':
         bgColor = AppColors.statusDone;
         textColor = AppColors.statusDoneText;
-        label = 'Selesai';
+        label = context.tr('status_done');
+        break;
+      case 'taken':
+      case 'sudahdiambil':
+        bgColor = AppColors.statusDone;
+        textColor = AppColors.statusDoneText;
+        label = context.tr('status_picked_up');
         break;
       case 'pending':
       default:
         bgColor = AppColors.statusNotStarted;
         textColor = AppColors.statusNotStartedText;
-        label = 'Belum mulai';
+        label = context.tr('status_not_started');
         break;
     }
 

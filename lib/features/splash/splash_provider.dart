@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jahitin_mobile/core/services/storage_service.dart';
 import 'package:jahitin_mobile/core/constants/storage_keys.dart';
@@ -24,9 +25,18 @@ class SplashNotifier extends Notifier<SplashState> {
 
     state = state.copyWith(status: SplashStatus.loading);
 
-    final storageAppState = await storage.getAppState();
+    // Check & resolve language setting
+    final storedLanguage = await storage.getLanguage();
+    if (storedLanguage == null || storedLanguage.isEmpty) {
+      final osLang = ui.PlatformDispatcher.instance.locale.languageCode.toLowerCase();
+      final resolvedLang = (osLang == 'id' || osLang == 'in')
+          ? StorageLanguage.id
+          : StorageLanguage.en;
 
-    await storage.setDeviceId('bocil');
+      await storage.setLanguage(resolvedLang);
+    }
+
+    final storageAppState = await storage.getAppState();
 
     // check version and API for update, if needed
     // ...

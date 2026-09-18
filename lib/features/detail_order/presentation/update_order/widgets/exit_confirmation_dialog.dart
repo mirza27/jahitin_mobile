@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/constants/app_colors.dart';
+import '../../../../../../core/localization/app_localizations_ext.dart';
 
 class ExitConfirmationDialog extends StatelessWidget {
   const ExitConfirmationDialog({super.key});
@@ -19,17 +20,17 @@ class ExitConfirmationDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      title: const Text(
-        'Simpan Perubahan?',
-        style: TextStyle(
+      title: Text(
+        context.tr('dialog_unsaved_title'),
+        style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
           color: AppColors.textPrimary,
         ),
       ),
-      content: const Text(
-        'Terdapat perubahan pada pesanan ini. Apakah Anda ingin menyimpan perubahan sebelum kembali?',
-        style: TextStyle(
+      content: Text(
+        context.tr('dialog_unsaved_message'),
+        style: const TextStyle(
           fontSize: 14,
           color: AppColors.textSecondary,
         ),
@@ -48,9 +49,9 @@ class ExitConfirmationDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text(
-                  'Buang',
-                  style: TextStyle(
+                child: Text(
+                  context.tr('btn_discard'),
+                  style: const TextStyle(
                     color: AppColors.error,
                     fontWeight: FontWeight.w600,
                   ),
@@ -69,9 +70,9 @@ class ExitConfirmationDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text(
-                  'Simpan',
-                  style: TextStyle(
+                child: Text(
+                  context.tr('save'),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),

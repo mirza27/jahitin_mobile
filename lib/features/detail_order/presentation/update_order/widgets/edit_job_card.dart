@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../../../core/constants/app_colors.dart';
+import '../../../../../../core/localization/app_localizations_ext.dart';
 import '../../../model/update_detail_order.dart';
 
 class EditJobCard extends StatelessWidget {
@@ -19,11 +20,11 @@ class EditJobCard extends StatelessWidget {
     required this.onStatusChanged,
   });
 
-  static const List<Map<String, String>> _statusOptions = [
-    {'key': 'pending', 'label': 'Belum mulai'},
-    {'key': 'inprogress', 'label': 'Diproses'},
-    {'key': 'completed', 'label': 'Selesai'},
-    {'key': 'taken', 'label': 'Sudah diambil'},
+  List<Map<String, String>> _getStatusOptions(BuildContext context) => [
+    {'key': 'pending', 'label': context.tr('status_not_started')},
+    {'key': 'inprogress', 'label': context.tr('status_processed')},
+    {'key': 'completed', 'label': context.tr('status_done')},
+    {'key': 'taken', 'label': context.tr('status_picked_up')},
   ];
 
   @override
@@ -36,7 +37,7 @@ class EditJobCard extends StatelessWidget {
 
     final garmentTitle = (item.categoryName != null && item.categoryName!.isNotEmpty)
         ? item.categoryName!
-        : 'Pakaian';
+        : context.tr('default_garment_fallback');
 
     final serviceTitle = (item.customServiceName != null && item.customServiceName!.isNotEmpty)
         ? item.customServiceName!
@@ -45,6 +46,7 @@ class EditJobCard extends StatelessWidget {
             : '-');
 
     final currentStatus = _normalizeStatus(item.status);
+    final statusOptions = _getStatusOptions(context);
 
     return Container(
       width: double.infinity,
@@ -116,7 +118,10 @@ class EditJobCard extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 6),
                     child: Text(
-                      'Untuk: ${item.clothesFor}',
+                      context.tr(
+                        'for_recipient_prefix',
+                        params: {'name': item.clothesFor!},
+                      ),
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
@@ -131,9 +136,9 @@ class EditJobCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Biaya:',
-                      style: TextStyle(
+                    Text(
+                      context.tr('cost_label_colon'),
+                      style: const TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
                       ),
@@ -153,7 +158,10 @@ class EditJobCard extends StatelessWidget {
                 if (item.notes != null && item.notes!.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(
-                    'Catatan: ${item.notes}',
+                    context.tr(
+                      'notes_label_colon',
+                      params: {'notes': item.notes!},
+                    ),
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
@@ -173,7 +181,7 @@ class EditJobCard extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: _statusOptions.map((opt) {
+              children: statusOptions.map((opt) {
                 final isSelected = currentStatus == opt['key'];
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
