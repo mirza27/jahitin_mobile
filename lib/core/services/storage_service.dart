@@ -45,6 +45,7 @@ class StorageService {
   Future<String?> getDeviceId() => _storage.read(key: StorageKeys.deviceId);
   Future<String?> getToken() => _storage.read(key: StorageKeys.token);
   Future<String?> getAuthType() => _storage.read(key: StorageKeys.authType);
+  Future<String?> getLanguage() => _storage.read(key: StorageKeys.language);
 
   Future<void> setAppState(String value) =>
       _storage.write(key: StorageKeys.appState, value: value);
@@ -60,6 +61,9 @@ class StorageService {
 
   Future<void> setAuthType(String value) =>
       _storage.write(key: StorageKeys.authType, value: value);
+
+  Future<void> setLanguage(String value) =>
+      _storage.write(key: StorageKeys.language, value: value);
 
   Future<void> clearAllData() async {
     await _storage.deleteAll();

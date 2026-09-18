@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'core/constants/app_colors.dart';
+import 'core/localization/app_localizations.dart';
 import 'features/splash/screens/splash_screen.dart';
 
 void main() async {
@@ -21,16 +22,25 @@ class JahitinApp extends StatelessWidget {
     return MaterialApp(
       title: 'Jahitin',
       debugShowCheckedModeBanner: false,
-      locale: const Locale('id', 'ID'),
       supportedLocales: const [
-        Locale('id', 'ID'),
         Locale('en', 'US'),
+        Locale('id', 'ID'),
       ],
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      localeResolutionCallback: (locale, supportedLocales) {
+        if (locale == null) return const Locale('en', 'US');
+
+        if (locale.languageCode == 'id' || locale.languageCode == 'in') {
+          return const Locale('id', 'ID');
+        }
+
+        return const Locale('en', 'US');
+      },
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(

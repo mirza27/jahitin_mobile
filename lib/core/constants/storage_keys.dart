@@ -9,6 +9,7 @@ class StorageKeys {
   static const String email = 'email';
   static const String username = 'username';
   static const String authType = 'auth_type';
+  static const String language = 'language';
 }
 
 // check wheter the app ever been launched / installed
@@ -31,4 +32,12 @@ class StorageLoginStatus {
 
   static const String loggedOut = 'loggedOut';
   static const String loggedIn = 'loggedIn';
+}
+
+class StorageLanguage {
+  StorageLanguage._();
+
+  static const String en = 'en';
+  static const String id = 'id';
+  static const String defaultLanguage = en;
 }
