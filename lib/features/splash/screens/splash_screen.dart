@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jahitin_mobile/core/localization/app_localizations_ext.dart';
 import 'package:jahitin_mobile/features/splash/splash_provider.dart';
 import 'package:jahitin_mobile/features/splash/splash_state.dart';
 import '../../../core/constants/app_colors.dart';
@@ -59,9 +60,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Jahitin',
-              style: TextStyle(
+            Text(
+              context.tr('app_name'),
+              style: const TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primary,
@@ -69,9 +70,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Manajemen Order Penjahit',
-              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+            Text(
+              context.tr('app_tagline'),
+              style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 48),
           ],

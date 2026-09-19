@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jahitin_mobile/core/localization/app_localizations_ext.dart';
 import 'package:jahitin_mobile/features/home/presentation/home/screens/home_screens.dart';
 import 'package:jahitin_mobile/features/registration/registration_provider.dart';
 import 'package:jahitin_mobile/features/registration/registration_state.dart';
@@ -49,13 +50,13 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 48),
-              _buildHeader(),
+              _buildHeader(context),
               const SizedBox(height: 40),
-              _buildForm(),
+              _buildForm(context),
               const SizedBox(height: 32),
               if (registration.status == RegistrationStatus.error)
-                _buildErrorBanner(registration.message),
-              _buildRegisterButton(),
+                _buildErrorBanner(context, registration.message),
+              _buildRegisterButton(context),
               const SizedBox(height: 24),
             ],
           ),
@@ -64,7 +65,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -82,18 +83,18 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        const Text(
-          'Daftar Akun',
-          style: TextStyle(
+        Text(
+          context.tr('register_account'),
+          style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
-          'Masukkan nama Anda untuk mulai menggunakan Jahitin.',
-          style: TextStyle(
+        Text(
+          context.tr('register_subtitle'),
+          style: const TextStyle(
             fontSize: 14,
             color: AppColors.textSecondary,
             height: 1.4,
@@ -103,15 +104,15 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
     );
   }
 
-  Widget _buildForm() {
+  Widget _buildForm(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Nama Pengguna',
-            style: TextStyle(
+          Text(
+            context.tr('username'),
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -124,10 +125,10 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
             textCapitalization: TextCapitalization.words,
             style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
             validator: (v) => (v == null || v.trim().isEmpty)
-                ? 'Nama tidak boleh kosong'
+                ? context.tr('name_required')
                 : null,
             decoration: InputDecoration(
-              hintText: 'Contoh: Bu Siti',
+              hintText: context.tr('name_hint'),
               hintStyle: const TextStyle(
                 color: AppColors.textHint,
                 fontSize: 15,
@@ -176,7 +177,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
     );
   }
 
-  Widget _buildErrorBanner(String? message) {
+  Widget _buildErrorBanner(BuildContext context, String? message) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Container(
@@ -193,7 +194,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                message ?? 'Terjadi kesalahan. Coba lagi.',
+                message ?? context.tr('general_error'),
                 style: const TextStyle(fontSize: 13, color: AppColors.error),
               ),
             ),
@@ -203,7 +204,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
     );
   }
 
-  Widget _buildRegisterButton() {
+  Widget _buildRegisterButton(BuildContext context) {
     final isLoading =
         ref.watch(registrationProvider).status == RegistrationStatus.loading;
 
@@ -230,9 +231,9 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                   strokeWidth: 2.5,
                 ),
               )
-            : const Text(
-                'Daftar Sekarang',
-                style: TextStyle(
+            : Text(
+                context.tr('register_now'),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.3,

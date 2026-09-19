@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/localization/app_localizations_ext.dart';
 import '../presentation/home/home_provider.dart';
 
 class ConfigSidebar extends ConsumerWidget {
@@ -61,7 +62,7 @@ class ConfigSidebar extends ConsumerWidget {
                         children: [
                           _buildMenuItem(
                             icon: Icons.person_outline,
-                            title: 'Akun',
+                            title: context.tr('account'),
                             onTap: () {
                               ref
                                   .read(homeProvider.notifier)
@@ -70,7 +71,7 @@ class ConfigSidebar extends ConsumerWidget {
                           ),
                           _buildMenuItem(
                             icon: Icons.settings_outlined,
-                            title: 'Pengaturan',
+                            title: context.tr('settings'),
                             onTap: () {
                               ref
                                   .read(homeProvider.notifier)
@@ -83,7 +84,7 @@ class ConfigSidebar extends ConsumerWidget {
 
                     // Footer
                     const Divider(height: 1, color: AppColors.divider),
-                    _buildFooter(),
+                    _buildFooter(context),
                   ],
                 ),
               ),
@@ -100,6 +101,11 @@ class ConfigSidebar extends ConsumerWidget {
     String? name,
     String? email,
   ) {
+    final defaultName = context.tr('default_user_name');
+    final avatarLetter = (name != null && name.isNotEmpty)
+        ? name[0].toUpperCase()
+        : (defaultName.isNotEmpty ? defaultName[0].toUpperCase() : 'U');
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
       child: Row(
@@ -108,9 +114,7 @@ class ConfigSidebar extends ConsumerWidget {
             radius: 22,
             backgroundColor: AppColors.primaryLight,
             child: Text(
-              name != null && name.isNotEmpty
-                  ? name[0].toUpperCase()
-                  : 'U',
+              avatarLetter,
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -125,7 +129,7 @@ class ConfigSidebar extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  name ?? 'Pengguna',
+                  name ?? defaultName,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -193,7 +197,7 @@ class ConfigSidebar extends ConsumerWidget {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -211,9 +215,9 @@ class ConfigSidebar extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Text(
-                'Jahitin',
-                style: TextStyle(
+              Text(
+                context.tr('app_name'),
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
@@ -223,9 +227,9 @@ class ConfigSidebar extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Aplikasi Manajemen Jahitan',
-            style: TextStyle(
+          Text(
+            context.tr('sidebar_tagline'),
+            style: const TextStyle(
               fontSize: 11,
               color: AppColors.textHint,
             ),

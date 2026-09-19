@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/models/job_item.dart';
 import 'step_a_service_selection.dart';
 import 'step_b_measurements_form.dart';
@@ -75,7 +76,9 @@ class _AddJobBottomSheetState extends State<AddJobBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.existingJob != null ? 'Edit Pekerjaan' : 'Tambah Pekerjaan';
+    final title = widget.existingJob != null
+        ? context.tr('edit_job')
+        : context.tr('add_job');
 
     return Container(
       constraints: BoxConstraints(
@@ -88,7 +91,7 @@ class _AddJobBottomSheetState extends State<AddJobBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildHeader(title),
+          _buildHeader(context, title),
           Flexible(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
@@ -138,7 +141,7 @@ class _AddJobBottomSheetState extends State<AddJobBottomSheet> {
     );
   }
 
-  Widget _buildHeader(String title) {
+  Widget _buildHeader(BuildContext context, String title) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
       decoration: const BoxDecoration(
@@ -175,7 +178,9 @@ class _AddJobBottomSheetState extends State<AddJobBottomSheet> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  _currentStep == 0 ? 'Langkah 1/2' : 'Langkah 2/2',
+                  _currentStep == 0
+                      ? context.tr('step_1_2')
+                      : context.tr('step_2_2'),
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

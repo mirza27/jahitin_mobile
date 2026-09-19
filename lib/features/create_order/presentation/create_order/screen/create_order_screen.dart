@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../create_order_item/screens/create_order_detail_screen.dart';
 import '../create_order_provider.dart';
 import '../../select_customer/widgets/customer_search_field.dart';
@@ -46,9 +47,9 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          'Pesanan Baru',
-          style: TextStyle(
+        title: Text(
+          context.tr('new_order'),
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -62,9 +63,9 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
               color: AppColors.primaryLight,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text(
-              'Langkah 1 dari 2',
-              style: TextStyle(
+            child: Text(
+              context.tr('step_1_of_2'),
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,
@@ -86,18 +87,18 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
                     const SizedBox(height: 24),
                     const DeadlinePickerSection(),
                     const SizedBox(height: 24),
-                    const Text(
-                      'Catatan Pesanan',
-                      style: TextStyle(
+                    Text(
+                      context.tr('order_notes_title'),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Catatan umum untuk seluruh pesanan (opsional)',
-                      style: TextStyle(
+                    Text(
+                      context.tr('order_notes_subtitle'),
+                      style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
                       ),
@@ -107,8 +108,7 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
                       controller: _notesController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText:
-                            'Contoh: Kain sudah disediakan, minta dipotong rapi...',
+                        hintText: context.tr('order_notes_hint'),
                         hintStyle: const TextStyle(
                           fontSize: 14,
                           color: AppColors.textHint,
@@ -136,14 +136,14 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
                 ),
               ),
             ),
-            _buildBottomAction(state.isValid),
+            _buildBottomAction(context, state.isValid),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBottomAction(bool isValid) {
+  Widget _buildBottomAction(BuildContext context, bool isValid) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -179,15 +179,15 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
                   );
                 }
               : null,
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Lanjut ke Detail Pesanan',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                context.tr('btn_continue_to_detail'),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
-              SizedBox(width: 8),
-              Icon(Icons.arrow_forward, size: 18),
+              const SizedBox(width: 8),
+              const Icon(Icons.arrow_forward, size: 18),
             ],
           ),
         ),

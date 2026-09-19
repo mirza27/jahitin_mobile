@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../../../core/models/customer.dart';
 
 class CustomerSummaryCard extends StatelessWidget {
@@ -58,7 +59,7 @@ class CustomerSummaryCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        customer?.name ?? 'Tanpa Pelanggan',
+                        customer?.name ?? context.tr('no_customer_assigned'),
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -85,7 +86,7 @@ class CustomerSummaryCard extends StatelessWidget {
                     color: AppColors.primary,
                   ),
                   onPressed: onEditStep1,
-                  tooltip: 'Ubah Data Pelanggan & Target',
+                  tooltip: context.tr('tooltip_edit_customer_target'),
                 ),
             ],
           ),
@@ -100,9 +101,9 @@ class CustomerSummaryCard extends StatelessWidget {
                 color: AppColors.primary,
               ),
               const SizedBox(width: 8),
-              const Text(
-                'Target Selesai: ',
-                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              Text(
+                context.tr('target_deadline_label'),
+                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
               Expanded(
                 child: Text(

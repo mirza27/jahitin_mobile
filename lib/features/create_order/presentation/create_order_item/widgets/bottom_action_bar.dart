@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
 
 class BottomActionBar extends StatelessWidget {
   final bool canSubmit;
@@ -43,9 +44,9 @@ class BottomActionBar extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
               onPressed: isSubmitting ? null : onSaveDraft,
-              child: const Text(
-                'Simpan Draft',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              child: Text(
+                context.tr('btn_save_draft'),
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -76,9 +77,9 @@ class BottomActionBar extends StatelessWidget {
                         color: Colors.white,
                       ),
                     )
-                  : const Text(
-                      'Buat Pesanan',
-                      style: TextStyle(
+                  : Text(
+                      context.tr('btn_create_order'),
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),

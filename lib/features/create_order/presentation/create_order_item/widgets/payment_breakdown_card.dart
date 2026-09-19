@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
 
 class PaymentBreakdownCard extends StatefulWidget {
   final double totalCost;
@@ -69,9 +70,9 @@ class _PaymentBreakdownCardState extends State<PaymentBreakdownCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Rincian Pembayaran',
-            style: TextStyle(
+          Text(
+            context.tr('payment_breakdown_title'),
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -81,9 +82,9 @@ class _PaymentBreakdownCardState extends State<PaymentBreakdownCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Total Biaya',
-                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+              Text(
+                context.tr('total_cost'),
+                style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
               ),
               Text(
                 currencyFormatter.format(widget.totalCost),
@@ -98,11 +99,11 @@ class _PaymentBreakdownCardState extends State<PaymentBreakdownCard> {
           const SizedBox(height: 12),
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 flex: 4,
                 child: Text(
-                  'Uang Muka / DP',
-                  style: TextStyle(
+                  context.tr('down_payment'),
+                  style: const TextStyle(
                     fontSize: 14,
                     color: AppColors.textSecondary,
                   ),
@@ -167,9 +168,9 @@ class _PaymentBreakdownCardState extends State<PaymentBreakdownCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Sisa Pembayaran',
-                style: TextStyle(
+              Text(
+                context.tr('remaining_balance'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../../../core/models/job_item.dart';
 
 class JobItemCard extends StatelessWidget {
@@ -80,7 +81,10 @@ class JobItemCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Untuk: ${job.recipientName}',
+                      context.tr(
+                        'for_recipient_prefix',
+                        params: {'name': job.recipientName},
+                      ),
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
@@ -106,31 +110,34 @@ class JobItemCard extends StatelessWidget {
                   }
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'edit',
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.edit_outlined,
                           size: 18,
                           color: AppColors.textPrimary,
                         ),
-                        SizedBox(width: 8),
-                        Text('Ubah'),
+                        const SizedBox(width: 8),
+                        Text(context.tr('edit')),
                       ],
                     ),
                   ),
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.delete_outline,
                           size: 18,
                           color: AppColors.error,
                         ),
-                        SizedBox(width: 8),
-                        Text('Hapus', style: TextStyle(color: AppColors.error)),
+                        const SizedBox(width: 8),
+                        Text(
+                          context.tr('delete'),
+                          style: const TextStyle(color: AppColors.error),
+                        ),
                       ],
                     ),
                   ),
@@ -156,8 +163,13 @@ class JobItemCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     job.measurements.isEmpty
-                        ? 'Ukuran belum diisi'
-                        : '${job.measurements.filledCount} parameter ukuran',
+                        ? context.tr('measurement_empty')
+                        : context.tr(
+                            'measurement_filled_count',
+                            params: {
+                              'count': '${job.measurements.filledCount}'
+                            },
+                          ),
                     style: TextStyle(
                       fontSize: 12,
                       color: job.measurements.isEmpty

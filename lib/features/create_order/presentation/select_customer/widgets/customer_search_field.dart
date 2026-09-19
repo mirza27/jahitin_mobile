@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../../../core/models/customer.dart';
 import '../../create_order/create_order_provider.dart';
 import '../select_customer_provider.dart';
@@ -74,7 +75,7 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         backgroundColor: AppColors.surface,
-        title: const Text('Tambah Pelanggan Baru'),
+        title: Text(dialogContext.tr('dialog_add_customer_title')),
         content: Form(
           key: formKey,
           child: SingleChildScrollView(
@@ -83,23 +84,23 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
               children: [
                 _dialogField(
                   nameController,
-                  'Nama Lengkap *',
-                  'Nama wajib diisi',
+                  dialogContext.tr('customer_fullname_label'),
+                  dialogContext.tr('customer_name_required'),
                 ),
                 const SizedBox(height: 12),
                 _dialogField(
                   phoneController,
-                  'No. Telepon / WhatsApp *',
-                  'Nomor telepon wajib diisi',
+                  dialogContext.tr('customer_phone_label'),
+                  dialogContext.tr('customer_phone_required'),
                   keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: addressController,
                   maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: 'Alamat (Opsional)',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: dialogContext.tr('customer_address_label'),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
               ],
@@ -109,7 +110,7 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Batal'),
+            child: Text(dialogContext.tr('cancel')),
           ),
           ElevatedButton(
             onPressed: () {
@@ -128,7 +129,7 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
               _focusNode.unfocus();
               Navigator.pop(dialogContext);
             },
-            child: const Text('Simpan & Pilih'),
+            child: Text(dialogContext.tr('btn_save_and_select')),
           ),
         ],
       ),
@@ -163,14 +164,14 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Pelanggan',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              context.tr('customer'),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             TextButton.icon(
               onPressed: () => _showAddCustomerDialog(context),
               icon: const Icon(Icons.add, size: 18),
-              label: const Text('Pelanggan Baru'),
+              label: Text(context.tr('new_customer')),
             ),
           ],
         ),
@@ -178,18 +179,18 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
         if (selectedCustomer != null)
           _buildSelectedCustomerCard(selectedCustomer)
         else
-          _buildSearchInput(),
-        if (_isSearching && selectedCustomer == null) _buildSuggestionsList(),
+          _buildSearchInput(context),
+        if (_isSearching && selectedCustomer == null) _buildSuggestionsList(context),
       ],
     );
   }
 
-  Widget _buildSearchInput() {
+  Widget _buildSearchInput(BuildContext context) {
     return TextField(
       controller: _searchController,
       focusNode: _focusNode,
       decoration: InputDecoration(
-        hintText: 'Cari nama atau no. telepon...',
+        hintText: context.tr('customer_search_hint'),
         prefixIcon: const Icon(Icons.search),
         suffixIcon: _searchController.text.isEmpty
             ? null
@@ -223,7 +224,7 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
     );
   }
 
-  Widget _buildSuggestionsList() {
+  Widget _buildSuggestionsList(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(top: 6),
       decoration: BoxDecoration(
@@ -233,10 +234,10 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
       ),
       child: _filteredCustomers.isEmpty
           ? ListTile(
-              title: const Text('Pelanggan tidak ditemukan.'),
+              title: Text(context.tr('customer_not_found')),
               trailing: TextButton(
                 onPressed: () => _showAddCustomerDialog(context),
-                child: const Text('Tambah Baru'),
+                child: Text(context.tr('add_new')),
               ),
             )
           : ListView.separated(

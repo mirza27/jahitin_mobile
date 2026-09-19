@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../../create_order/presentation/create_order/screen/create_order_screen.dart';
 import '../../../../detail_order/presentation/detail_order/screen/detail_order_screen.dart';
 import '../../../widgets/config_sidebar.dart';
@@ -48,6 +49,7 @@ class HomeScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildTabs(
+                            context,
                             ref,
                             homeState.selectedTab,
                             activeCount: homeState.activeOrders.length,
@@ -60,9 +62,9 @@ class HomeScreen extends ConsumerWidget {
                             _buildLoadingState()
                           else if (homeState.status == HomeStatus.error &&
                               homeState.orderList.isEmpty)
-                            _buildErrorState(ref, homeState.message)
+                            _buildErrorState(context, ref, homeState.message)
                           else if (displayedOrders.isEmpty)
-                            _buildEmptyState(homeState.selectedTab)
+                            _buildEmptyState(context, homeState.selectedTab)
                           else
                             ...displayedOrders.map(
                               (order) => Padding(
@@ -105,7 +107,7 @@ class HomeScreen extends ConsumerWidget {
               color: AppColors.textPrimary,
               size: 24,
             ),
-            tooltip: 'Menu',
+            tooltip: context.tr('menu'),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -113,7 +115,13 @@ class HomeScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  homeState.greetingText,
+                  context.tr(
+                    'greeting_user',
+                    params: {
+                      'name': homeState.user?.name ??
+                          context.tr('default_user_name'),
+                    },
+                  ),
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -122,7 +130,12 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  homeState.activeOrderSummary,
+                  context.tr(
+                    'active_order_summary',
+                    params: {
+                      'count': '${homeState.activeOrders.length}',
+                    },
+                  ),
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
@@ -144,7 +157,7 @@ class HomeScreen extends ConsumerWidget {
               color: AppColors.textPrimary,
               size: 24,
             ),
-            tooltip: 'Cari Pesanan',
+            tooltip: context.tr('search_orders'),
           ),
         ],
       ),
@@ -162,9 +175,9 @@ class HomeScreen extends ConsumerWidget {
           );
         },
         icon: const Icon(Icons.add, size: 20, color: Colors.white),
-        label: const Text(
-          'Pesanan Baru',
-          style: TextStyle(
+        label: Text(
+          context.tr('new_order'),
+          style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -183,6 +196,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildTabs(
+    BuildContext context,
     WidgetRef ref,
     HomeTab currentTab, {
     required int activeCount,
@@ -192,20 +206,23 @@ class HomeScreen extends ConsumerWidget {
     return Row(
       children: [
         _buildTabChip(
-          label: 'Aktif ($activeCount)',
+          label: context.tr('tab_active', params: {'count': '$activeCount'}),
           isSelected: currentTab == HomeTab.active,
           onTap: () => ref.read(homeProvider.notifier).setTab(HomeTab.active),
         ),
         const SizedBox(width: 8),
         _buildTabChip(
-          label: 'Selesai ($completedCount)',
+          label: context.tr(
+            'tab_completed',
+            params: {'count': '$completedCount'},
+          ),
           isSelected: currentTab == HomeTab.completed,
           onTap: () =>
               ref.read(homeProvider.notifier).setTab(HomeTab.completed),
         ),
         const SizedBox(width: 8),
         _buildTabChip(
-          label: 'Semua ($allCount)',
+          label: context.tr('tab_all', params: {'count': '$allCount'}),
           isSelected: currentTab == HomeTab.all,
           onTap: () => ref.read(homeProvider.notifier).setTab(HomeTab.all),
         ),
@@ -239,7 +256,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildOrderCard(BuildContext context, OrderDisplay order) {
-    final deadlineText = _formatDeadline(order.deadline);
+    final deadlineText = _formatDeadline(context, order.deadline);
     final items = order.orderDisplayItems ?? [];
 
     return InkWell(
@@ -274,12 +291,12 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                _buildStatusChip(order.orderStatus),
+                _buildStatusChip(context, order.orderStatus),
               ],
             ),
             const SizedBox(height: 2),
             Text(
-              '${order.itemCount} pekerjaan',
+              context.tr('job_count', params: {'count': '${order.itemCount}'}),
               style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,
@@ -292,7 +309,7 @@ class HomeScreen extends ConsumerWidget {
             if (items.isNotEmpty) ...[
               const SizedBox(height: 10),
               ...items.map((item) {
-                final itemLabel = _getItemDescription(item);
+                final itemLabel = _getItemDescription(context, item);
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(
@@ -325,7 +342,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  String _getItemDescription(OrderItemDisplay item) {
+  String _getItemDescription(BuildContext context, OrderItemDisplay item) {
     if (item.clothesFor != null && item.clothesFor!.isNotEmpty) {
       if (item.customServiceName != null &&
           item.customServiceName!.isNotEmpty) {
@@ -336,19 +353,20 @@ class HomeScreen extends ConsumerWidget {
     if (item.customServiceName != null && item.customServiceName!.isNotEmpty) {
       return item.customServiceName!;
     }
-    return 'Pekerjaan jahitan';
+    return context.tr('default_job_item');
   }
 
-  String? _formatDeadline(DateTime? deadline) {
+  String? _formatDeadline(BuildContext context, DateTime? deadline) {
     if (deadline == null) return null;
+    final locale = Localizations.localeOf(context).toString();
     try {
-      return DateFormat('EEE, d MMM', 'id_ID').format(deadline);
+      return DateFormat('EEE, d MMM', locale).format(deadline);
     } catch (_) {
       return DateFormat('d MMM yyyy').format(deadline);
     }
   }
 
-  Widget _buildStatusChip(OrderStatus status) {
+  Widget _buildStatusChip(BuildContext context, OrderStatus status) {
     late final Color bg;
     late final Color fg;
     late final String label;
@@ -357,22 +375,22 @@ class HomeScreen extends ConsumerWidget {
       case OrderStatus.inProgress:
         bg = AppColors.statusProcessed;
         fg = AppColors.statusProcessedText;
-        label = 'Diproses';
+        label = context.tr('status_processed');
         break;
       case OrderStatus.pending:
         bg = AppColors.statusNotStarted;
         fg = AppColors.statusNotStartedText;
-        label = 'Belum mulai';
+        label = context.tr('status_not_started');
         break;
       case OrderStatus.completed:
         bg = AppColors.statusDone;
         fg = AppColors.statusDoneText;
-        label = 'Selesai';
+        label = context.tr('status_done');
         break;
       case OrderStatus.pickedUp:
         bg = AppColors.statusDone;
         fg = AppColors.statusDoneText;
-        label = 'Sudah Diambil';
+        label = context.tr('status_picked_up');
         break;
     }
 
@@ -428,7 +446,11 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildErrorState(WidgetRef ref, String? message) {
+  Widget _buildErrorState(
+    BuildContext context,
+    WidgetRef ref,
+    String? message,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(top: 60),
       child: Center(
@@ -437,7 +459,7 @@ class HomeScreen extends ConsumerWidget {
             const Icon(Icons.error_outline, size: 48, color: AppColors.error),
             const SizedBox(height: 12),
             Text(
-              message ?? 'Gagal memuat daftar pesanan',
+              message ?? context.tr('error_load_orders'),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 14,
@@ -454,7 +476,7 @@ class HomeScreen extends ConsumerWidget {
                   vertical: 10,
                 ),
               ),
-              child: const Text('Coba Lagi'),
+              child: Text(context.tr('retry')),
             ),
           ],
         ),
@@ -462,17 +484,17 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState(HomeTab tab) {
+  Widget _buildEmptyState(BuildContext context, HomeTab tab) {
     String emptyMessage;
     switch (tab) {
       case HomeTab.active:
-        emptyMessage = 'Belum ada pesanan aktif';
+        emptyMessage = context.tr('empty_active_orders');
         break;
       case HomeTab.completed:
-        emptyMessage = 'Belum ada pesanan selesai';
+        emptyMessage = context.tr('empty_completed_orders');
         break;
       case HomeTab.all:
-        emptyMessage = 'Belum ada pesanan';
+        emptyMessage = context.tr('empty_all_orders');
         break;
     }
 

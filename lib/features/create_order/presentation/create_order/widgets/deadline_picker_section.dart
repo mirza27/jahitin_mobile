@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
 import '../create_order_provider.dart';
 import 'quick_date_chip.dart';
 
@@ -9,9 +10,9 @@ class DeadlinePickerSection extends ConsumerWidget {
   const DeadlinePickerSection({super.key});
 
   static const _quickOptions = [
-    (label: '3 Hari', days: 3),
-    (label: '1 Minggu', days: 7),
-    (label: '2 Minggu', days: 14),
+    (key: 'quick_3_days', days: 3),
+    (key: 'quick_1_week', days: 7),
+    (key: 'quick_2_weeks', days: 14),
   ];
 
   Future<void> _pickDate(BuildContext context, WidgetRef ref) async {
@@ -56,15 +57,15 @@ class DeadlinePickerSection extends ConsumerWidget {
     if (deadline != null) {
       deadlineText = DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(deadline);
     } else {
-      deadlineText = 'Pilih tanggal target selesai';
+      deadlineText = context.tr('select_deadline_placeholder');
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Target Tanggal Selesai',
-          style: TextStyle(
+        Text(
+          context.tr('target_deadline_title'),
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -77,7 +78,7 @@ class DeadlinePickerSection extends ConsumerWidget {
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: QuickDateChip(
-                label: opt.label,
+                label: context.tr(opt.key),
                 isSelected: isSelected,
                 onTap: () => ref
                     .read(createOrderProvider.notifier)

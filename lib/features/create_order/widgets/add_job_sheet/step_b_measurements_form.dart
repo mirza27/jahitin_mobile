@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/models/job_item.dart';
 
 class StepBMeasurementsForm extends StatefulWidget {
@@ -136,9 +137,9 @@ class _StepBMeasurementsFormState extends State<StepBMeasurementsForm> {
               constraints: const BoxConstraints(),
             ),
             const SizedBox(width: 8),
-            const Text(
-              'Ukuran Tubuh (cm)',
-              style: TextStyle(
+            Text(
+              context.tr('body_measurements_title'),
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -147,16 +148,16 @@ class _StepBMeasurementsFormState extends State<StepBMeasurementsForm> {
           ],
         ),
         const SizedBox(height: 4),
-        const Text(
-          'Masukkan ukuran yang sesuai dalam centimeter (opsional)',
-          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+        Text(
+          context.tr('body_measurements_subtitle'),
+          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 14),
-        _buildMeasurementGrid(),
+        _buildMeasurementGrid(context),
         const SizedBox(height: 20),
-        const Text(
-          'Estimasi Biaya',
-          style: TextStyle(
+        Text(
+          context.tr('estimated_cost_title'),
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -193,25 +194,25 @@ class _StepBMeasurementsFormState extends State<StepBMeasurementsForm> {
           ),
         ),
         const SizedBox(height: 20),
-        const Text(
-          'Foto Referensi Desain',
-          style: TextStyle(
+        Text(
+          context.tr('reference_photos_title'),
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 4),
-        const Text(
-          'Foto model baju / contoh yang diinginkan',
-          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+        Text(
+          context.tr('reference_photos_subtitle'),
+          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 10),
-        _buildPhotoSection(),
+        _buildPhotoSection(context),
         const SizedBox(height: 20),
-        const Text(
-          'Catatan Khusus Pekerjaan',
-          style: TextStyle(
+        Text(
+          context.tr('job_specific_notes_title'),
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -222,7 +223,7 @@ class _StepBMeasurementsFormState extends State<StepBMeasurementsForm> {
           controller: _notesController,
           maxLines: 2,
           decoration: InputDecoration(
-            hintText: 'Contoh: Minta kancing bungkus, belahan samping...',
+            hintText: context.tr('job_specific_notes_hint'),
             hintStyle: const TextStyle(fontSize: 13, color: AppColors.textHint),
             filled: true,
             fillColor: AppColors.surface,
@@ -254,9 +255,9 @@ class _StepBMeasurementsFormState extends State<StepBMeasurementsForm> {
               ),
             ),
             onPressed: _submit,
-            child: const Text(
-              'Simpan Pekerjaan',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            child: Text(
+              context.tr('btn_save_job'),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -264,21 +265,21 @@ class _StepBMeasurementsFormState extends State<StepBMeasurementsForm> {
     );
   }
 
-  Widget _buildMeasurementGrid() {
+  Widget _buildMeasurementGrid(BuildContext context) {
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _buildMeasurementInput(
-                label: 'Lingkar Dada',
+                label: context.tr('measurement_bust'),
                 controller: _lingkarDadaController,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildMeasurementInput(
-                label: 'Panjang Lengan',
+                label: context.tr('measurement_sleeve_length'),
                 controller: _panjangLenganController,
               ),
             ),
@@ -289,14 +290,14 @@ class _StepBMeasurementsFormState extends State<StepBMeasurementsForm> {
           children: [
             Expanded(
               child: _buildMeasurementInput(
-                label: 'Panjang Baju',
+                label: context.tr('measurement_dress_length'),
                 controller: _panjangBajuController,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildMeasurementInput(
-                label: 'Lingkar Pinggang',
+                label: context.tr('measurement_waist'),
                 controller: _lingkarPinggangController,
               ),
             ),
@@ -307,14 +308,14 @@ class _StepBMeasurementsFormState extends State<StepBMeasurementsForm> {
           children: [
             Expanded(
               child: _buildMeasurementInput(
-                label: 'Lebar Bahu',
+                label: context.tr('measurement_shoulder_width'),
                 controller: _lebarBahuController,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildMeasurementInput(
-                label: 'Lingkar Pinggul',
+                label: context.tr('measurement_hip'),
                 controller: _lingkarPinggulController,
               ),
             ),
@@ -373,7 +374,7 @@ class _StepBMeasurementsFormState extends State<StepBMeasurementsForm> {
     );
   }
 
-  Widget _buildPhotoSection() {
+  Widget _buildPhotoSection(BuildContext context) {
     return SizedBox(
       height: 80,
       child: ListView(
@@ -392,14 +393,14 @@ class _StepBMeasurementsFormState extends State<StepBMeasurementsForm> {
                   style: BorderStyle.solid,
                 ),
               ),
-              child: const Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_a_photo_outlined, size: 24, color: AppColors.primary),
-                  SizedBox(height: 4),
+                  const Icon(Icons.add_a_photo_outlined, size: 24, color: AppColors.primary),
+                  const SizedBox(height: 4),
                   Text(
-                    'Foto',
-                    style: TextStyle(
+                    context.tr('add_photo_btn'),
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textSecondary,

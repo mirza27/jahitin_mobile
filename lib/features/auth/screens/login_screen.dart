@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jahitin_mobile/core/localization/app_localizations_ext.dart';
 import 'package:jahitin_mobile/features/auth/auth_provider.dart';
 import 'package:jahitin_mobile/features/auth/auth_state.dart';
 import 'package:jahitin_mobile/features/home/presentation/home/screens/home_screens.dart';
@@ -40,8 +41,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (!success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login belum terhubung ke API'),
+        SnackBar(
+          content: Text(context.tr('login_api_unlinked')),
           backgroundColor: AppColors.error,
         ),
       );
@@ -113,18 +114,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        const Text(
-          'Masuk',
-          style: TextStyle(
+        Text(
+          context.tr('login'),
+          style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
-          'Selamat datang kembali di Jahitin.',
-          style: TextStyle(
+        Text(
+          context.tr('login_subtitle'),
+          style: const TextStyle(
             fontSize: 14,
             color: AppColors.textSecondary,
             height: 1.4,
@@ -140,33 +141,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildLabel('Email'),
+          _buildLabel(context.tr('email')),
           const SizedBox(height: 8),
           _buildTextField(
             controller: _emailController,
-            hint: 'contoh@email.com',
+            hint: context.tr('email_hint'),
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (v) {
-              if (v == null || v.trim().isEmpty)
-                return 'Email tidak boleh kosong';
+              if (v == null || v.trim().isEmpty) {
+                return context.tr('email_required');
+              }
               if (!RegExp(
                 r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
               ).hasMatch(v.trim())) {
-                return 'Format email tidak valid';
+                return context.tr('invalid_email');
               }
               return null;
             },
           ),
           const SizedBox(height: 20),
-          _buildLabel('Password'),
+          _buildLabel(context.tr('password')),
           const SizedBox(height: 8),
           TextFormField(
             controller: _passwordController,
             obscureText: _obscurePassword,
             style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
             validator: (v) =>
-                (v == null || v.isEmpty) ? 'Password tidak boleh kosong' : null,
+                (v == null || v.isEmpty) ? context.tr('password_required') : null,
             decoration: InputDecoration(
               hintText: '••••••••',
               hintStyle: const TextStyle(
@@ -311,9 +313,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   strokeWidth: 2.5,
                 ),
               )
-            : const Text(
-                'Masuk',
-                style: TextStyle(
+            : Text(
+                context.tr('login'),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.3,

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
+import '../../../../detail_order/presentation/detail_order/screen/detail_order_screen.dart';
 import '../../../model/order_display.dart';
 import '../order_search_provider.dart';
 import '../order_search_state.dart';
@@ -96,7 +98,7 @@ class _OrderSearchScreenState extends ConsumerState<OrderSearchScreen> {
                   color: AppColors.textPrimary,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Cari nama pelanggan atau pesanan...',
+                  hintText: context.tr('search_hint'),
                   hintStyle: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textHint,
@@ -168,31 +170,31 @@ class _OrderSearchScreenState extends ConsumerState<OrderSearchScreen> {
   }
 
   Widget _buildInitialState() {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32),
+        padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.search_rounded,
               size: 56,
               color: AppColors.textHint,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
-              'Cari Pesanan',
-              style: TextStyle(
+              context.tr('search_initial_title'),
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
               ),
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(
-              'Ketik nama pelanggan atau jenis jahitan untuk mulai mencari.',
+              context.tr('search_initial_desc'),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,
               ),
@@ -219,7 +221,7 @@ class _OrderSearchScreenState extends ConsumerState<OrderSearchScreen> {
             const Icon(Icons.error_outline, size: 48, color: AppColors.error),
             const SizedBox(height: 12),
             Text(
-              message ?? 'Gagal memuat hasil pencarian',
+              message ?? context.tr('search_error'),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 14,
@@ -240,7 +242,7 @@ class _OrderSearchScreenState extends ConsumerState<OrderSearchScreen> {
                   vertical: 10,
                 ),
               ),
-              child: const Text('Coba Lagi'),
+              child: Text(context.tr('retry')),
             ),
           ],
         ),
@@ -261,9 +263,9 @@ class _OrderSearchScreenState extends ConsumerState<OrderSearchScreen> {
               color: AppColors.textHint,
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Tidak Ditemukan',
-              style: TextStyle(
+            Text(
+              context.tr('search_empty_title'),
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -272,8 +274,8 @@ class _OrderSearchScreenState extends ConsumerState<OrderSearchScreen> {
             const SizedBox(height: 6),
             Text(
               query != null && query.isNotEmpty
-                  ? 'Tidak ada pesanan yang sesuai dengan "$query"'
-                  : 'Tidak ada pesanan yang sesuai',
+                  ? context.tr('search_empty_query_desc', params: {'query': query})
+                  : context.tr('search_empty_desc'),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 13,
@@ -305,77 +307,87 @@ class _OrderSearchScreenState extends ConsumerState<OrderSearchScreen> {
     final deadlineText = _formatDeadline(order.deadline);
     final items = order.orderDisplayItems ?? [];
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  order.customerName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              _buildStatusChip(order.orderStatus),
-            ],
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => DetailOrderScreen(orderId: order.orderId),
           ),
-          const SizedBox(height: 2),
-          Text(
-            '${order.itemCount} pekerjaan',
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          if (deadlineText != null) ...[
-            const SizedBox(height: 10),
-            _buildDateChip(deadlineText, order.orderStatus),
-          ],
-          if (items.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            ...items.map(
-              (item) {
-                final itemLabel = _getItemDescription(item);
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
+        );
+      },
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
                   child: Text(
-                    '• $itemLabel',
+                    order.customerName,
                     style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                      height: 1.3,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
                   ),
-                );
-              },
-            ),
-          ] else if (order.name != null && order.name!.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(
-                '• ${order.name}',
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                  height: 1.3,
                 ),
+                _buildStatusChip(order.orderStatus),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Text(
+              context.tr('job_count', params: {'count': '${order.itemCount}'}),
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondary,
               ),
             ),
+            if (deadlineText != null) ...[
+              const SizedBox(height: 10),
+              _buildDateChip(deadlineText, order.orderStatus),
+            ],
+            if (items.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              ...items.map(
+                (item) {
+                  final itemLabel = _getItemDescription(item);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      '• $itemLabel',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                        height: 1.3,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ] else if (order.name != null && order.name!.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  '• ${order.name}',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -392,13 +404,14 @@ class _OrderSearchScreenState extends ConsumerState<OrderSearchScreen> {
         item.customServiceName!.isNotEmpty) {
       return item.customServiceName!;
     }
-    return 'Pekerjaan jahitan';
+    return context.tr('default_job_item');
   }
 
   String? _formatDeadline(DateTime? deadline) {
     if (deadline == null) return null;
+    final locale = Localizations.localeOf(context).toString();
     try {
-      return DateFormat('EEE, d MMM', 'id_ID').format(deadline);
+      return DateFormat('EEE, d MMM', locale).format(deadline);
     } catch (_) {
       return DateFormat('d MMM yyyy').format(deadline);
     }
@@ -413,22 +426,22 @@ class _OrderSearchScreenState extends ConsumerState<OrderSearchScreen> {
       case OrderStatus.inProgress:
         bg = AppColors.statusProcessed;
         fg = AppColors.statusProcessedText;
-        label = 'Diproses';
+        label = context.tr('status_processed');
         break;
       case OrderStatus.pending:
         bg = AppColors.statusNotStarted;
         fg = AppColors.statusNotStartedText;
-        label = 'Belum mulai';
+        label = context.tr('status_not_started');
         break;
       case OrderStatus.completed:
         bg = AppColors.statusDone;
         fg = AppColors.statusDoneText;
-        label = 'Selesai';
+        label = context.tr('status_done');
         break;
       case OrderStatus.pickedUp:
         bg = AppColors.statusDone;
         fg = AppColors.statusDoneText;
-        label = 'Sudah Diambil';
+        label = context.tr('status_picked_up');
         break;
     }
 

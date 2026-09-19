@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/models/job_item.dart';
 import 'garment_category_chip.dart';
 
@@ -35,43 +36,15 @@ class _StepAServiceSelectionState extends State<StepAServiceSelection> {
   late final TextEditingController _recipientController;
   late final TextEditingController _customCategoryController;
 
-  static const _categories = [
-    (
-      category: GarmentCategory.gamis,
-      label: 'Gamis',
-      icon: Icons.checkroom_outlined,
-    ),
-    (
-      category: GarmentCategory.kemeja,
-      label: 'Kemeja',
-      icon: Icons.dry_cleaning_outlined,
-    ),
-    (
-      category: GarmentCategory.celana,
-      label: 'Celana',
-      icon: Icons.accessibility_new_outlined,
-    ),
-    (category: GarmentCategory.rok, label: 'Rok', icon: Icons.woman_outlined),
-    (
-      category: GarmentCategory.jas,
-      label: 'Jas',
-      icon: Icons.business_center_outlined,
-    ),
-    (
-      category: GarmentCategory.kebaya,
-      label: 'Kebaya',
-      icon: Icons.spa_outlined,
-    ),
-    (
-      category: GarmentCategory.kaos,
-      label: 'Kaos',
-      icon: Icons.local_laundry_service_outlined,
-    ),
-    (
-      category: GarmentCategory.lainnya,
-      label: 'Lainnya',
-      icon: Icons.more_horiz,
-    ),
+  static const _categoryDefs = [
+    (category: GarmentCategory.gamis, labelKey: 'category_gamis', icon: Icons.checkroom_outlined),
+    (category: GarmentCategory.kemeja, labelKey: 'category_shirt', icon: Icons.dry_cleaning_outlined),
+    (category: GarmentCategory.celana, labelKey: 'category_pants', icon: Icons.accessibility_new_outlined),
+    (category: GarmentCategory.rok, labelKey: 'category_skirt', icon: Icons.woman_outlined),
+    (category: GarmentCategory.jas, labelKey: 'category_suit', icon: Icons.business_center_outlined),
+    (category: GarmentCategory.kebaya, labelKey: 'category_kebaya', icon: Icons.spa_outlined),
+    (category: GarmentCategory.kaos, labelKey: 'category_tshirt', icon: Icons.local_laundry_service_outlined),
+    (category: GarmentCategory.lainnya, labelKey: 'category_other', icon: Icons.more_horiz),
   ];
 
   @override
@@ -104,33 +77,33 @@ class _StepAServiceSelectionState extends State<StepAServiceSelection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Jenis Layanan',
-          style: TextStyle(
+        Text(
+          context.tr('service_type_title'),
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 10),
-        _buildServiceTypeToggle(),
+        _buildServiceTypeToggle(context),
         const SizedBox(height: 20),
-        const Text(
-          'Kategori Pakaian',
-          style: TextStyle(
+        Text(
+          context.tr('garment_category_title'),
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 10),
-        _buildCategoryGrid(),
+        _buildCategoryGrid(context),
         if (widget.selectedCategory == GarmentCategory.lainnya) ...[
           const SizedBox(height: 10),
           TextField(
             controller: _customCategoryController,
             decoration: InputDecoration(
-              hintText: 'Nama kategori (contoh: Mukena, Kaftan...)',
+              hintText: context.tr('custom_category_hint'),
               hintStyle: const TextStyle(
                 fontSize: 13,
                 color: AppColors.textHint,
@@ -166,24 +139,24 @@ class _StepAServiceSelectionState extends State<StepAServiceSelection> {
           ),
         ],
         const SizedBox(height: 20),
-        const Text(
-          'Untuk Siapa',
-          style: TextStyle(
+        Text(
+          context.tr('recipient_title'),
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 4),
-        const Text(
-          'Nama penerima / pemilik pakaian ini',
-          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+        Text(
+          context.tr('recipient_subtitle'),
+          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 10),
         TextField(
           controller: _recipientController,
           decoration: InputDecoration(
-            hintText: 'Contoh: Bu Siti, Anak Pertama, Pak Budi...',
+            hintText: context.tr('recipient_hint'),
             hintStyle: const TextStyle(fontSize: 13, color: AppColors.textHint),
             filled: true,
             fillColor: AppColors.surface,
@@ -231,15 +204,15 @@ class _StepAServiceSelectionState extends State<StepAServiceSelection> {
                     widget.onNext();
                   }
                 : null,
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Lanjut ke Ukuran & Detail',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  context.tr('btn_continue_to_measurements'),
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                 ),
-                SizedBox(width: 8),
-                Icon(Icons.arrow_forward, size: 18),
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_forward, size: 18),
               ],
             ),
           ),
@@ -248,7 +221,7 @@ class _StepAServiceSelectionState extends State<StepAServiceSelection> {
     );
   }
 
-  Widget _buildServiceTypeToggle() {
+  Widget _buildServiceTypeToggle(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -258,14 +231,14 @@ class _StepAServiceSelectionState extends State<StepAServiceSelection> {
       child: Row(
         children: [
           _buildServiceToggleItem(
-            label: 'Jahit Baru',
+            label: context.tr('service_new_tailoring'),
             icon: Icons.content_cut,
             isSelected: widget.serviceType == ServiceType.jahitBaru,
             onTap: () => widget.onServiceTypeChanged(ServiceType.jahitBaru),
           ),
           const SizedBox(width: 4),
           _buildServiceToggleItem(
-            label: 'Permak',
+            label: context.tr('service_alteration'),
             icon: Icons.auto_fix_high,
             isSelected: widget.serviceType == ServiceType.permak,
             onTap: () => widget.onServiceTypeChanged(ServiceType.permak),
@@ -315,7 +288,7 @@ class _StepAServiceSelectionState extends State<StepAServiceSelection> {
     );
   }
 
-  Widget _buildCategoryGrid() {
+  Widget _buildCategoryGrid(BuildContext context) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -325,12 +298,12 @@ class _StepAServiceSelectionState extends State<StepAServiceSelection> {
         mainAxisSpacing: 8,
         childAspectRatio: 1.0,
       ),
-      itemCount: _categories.length,
+      itemCount: _categoryDefs.length,
       itemBuilder: (context, index) {
-        final cat = _categories[index];
+        final cat = _categoryDefs[index];
         final isSelected = widget.selectedCategory == cat.category;
         return GarmentCategoryChip(
-          label: cat.label,
+          label: context.tr(cat.labelKey),
           icon: cat.icon,
           isSelected: isSelected,
           onTap: () {

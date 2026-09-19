@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../../../core/models/job_item.dart';
 import '../../create_order/create_order_provider.dart';
 import '../../../widgets/add_job_sheet/add_job_bottom_sheet.dart';
@@ -66,9 +67,9 @@ class CreateOrderDetailScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          'Detail Pesanan',
-          style: TextStyle(
+        title: Text(
+          context.tr('order_detail'),
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -82,9 +83,9 @@ class CreateOrderDetailScreen extends ConsumerWidget {
               color: AppColors.primaryLight,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text(
-              'Langkah 2 dari 2',
-              style: TextStyle(
+            child: Text(
+              context.tr('step_2_of_2'),
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,
@@ -113,7 +114,10 @@ class CreateOrderDetailScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Daftar Pekerjaan (${state.jobs.length})',
+                          context.tr(
+                            'job_list_with_count',
+                            params: {'count': '${state.jobs.length}'},
+                          ),
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -128,9 +132,9 @@ class CreateOrderDetailScreen extends ConsumerWidget {
                               size: 18,
                               color: AppColors.primary,
                             ),
-                            label: const Text(
-                              'Tambah',
-                              style: TextStyle(
+                            label: Text(
+                              context.tr('add'),
+                              style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primary,
@@ -185,7 +189,11 @@ class CreateOrderDetailScreen extends ConsumerWidget {
                     .read(createOrderDetailProvider.notifier)
                     .submitOrder();
                 if (success && context.mounted) {
-                  _handleSuccess(context, ref, 'Pesanan berhasil dibuat!');
+                  _handleSuccess(
+                    context,
+                    ref,
+                    context.tr('order_created_success'),
+                  );
                 }
               },
               onSaveDraft: () async {
@@ -193,7 +201,11 @@ class CreateOrderDetailScreen extends ConsumerWidget {
                     .read(createOrderDetailProvider.notifier)
                     .submitOrder(isDraft: true);
                 if (success && context.mounted) {
-                  _handleSuccess(context, ref, 'Pesanan disimpan sebagai draf');
+                  _handleSuccess(
+                    context,
+                    ref,
+                    context.tr('order_saved_draft'),
+                  );
                 }
               },
             ),
@@ -227,19 +239,19 @@ class CreateOrderDetailScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 14),
-          const Text(
-            'Belum Ada Pekerjaan',
-            style: TextStyle(
+          Text(
+            context.tr('empty_jobs_title'),
+            style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Tambahkan pakaian yang akan dijahit atau dipermak pada pesanan ini',
+          Text(
+            context.tr('empty_jobs_subtitle'),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
@@ -253,9 +265,9 @@ class CreateOrderDetailScreen extends ConsumerWidget {
             ),
             onPressed: () => _openAddJobSheet(context, ref),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text(
-              'Tambah Pekerjaan Pertama',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            label: Text(
+              context.tr('btn_add_first_job'),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -277,9 +289,9 @@ class CreateOrderDetailScreen extends ConsumerWidget {
         ),
         onPressed: () => _openAddJobSheet(context, ref),
         icon: const Icon(Icons.add, size: 20),
-        label: const Text(
-          'Tambah Pekerjaan Lain',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        label: Text(
+          context.tr('btn_add_another_job'),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
     );
