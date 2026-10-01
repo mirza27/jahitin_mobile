@@ -12,21 +12,37 @@ import '../widgets/customer_summary_card.dart';
 import '../widgets/job_item_card.dart';
 import '../widgets/payment_breakdown_card.dart';
 
-class CreateOrderDetailScreen extends ConsumerWidget {
+class CreateOrderDetailScreen extends ConsumerStatefulWidget {
   const CreateOrderDetailScreen({super.key});
 
+  @override
+  ConsumerState<CreateOrderDetailScreen> createState() =>
+      _CreateOrderDetailScreenState();
+}
+
+class _CreateOrderDetailScreenState
+    extends ConsumerState<CreateOrderDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(createOrderDetailProvider.notifier).loadCategoriesAndServices();
+    });
+  }
+
   Future<void> _openAddJobSheet(
-    BuildContext context,
-    WidgetRef ref, {
+    BuildContext context, {
     JobItem? existingJob,
   }) async {
     final state = ref.read(createOrderDetailProvider);
-    final defaultRecipient = state.customer?.name ?? '';
+    final defaultRecipient = state.customer?.displayName ?? '';
 
     final result = await AddJobBottomSheet.show(
       context,
       existingJob: existingJob,
       defaultRecipientName: defaultRecipient,
+      categories: state.clothesCategories,
+      serviceTypes: state.serviceTypes,
     );
 
     if (result != null) {
@@ -38,7 +54,7 @@ class CreateOrderDetailScreen extends ConsumerWidget {
     }
   }
 
-  void _handleSuccess(BuildContext context, WidgetRef ref, String message) {
+  void _handleSuccess(String message) {
     ref.read(createOrderProvider.notifier).reset();
     ref.read(createOrderDetailProvider.notifier).reset();
 
@@ -54,7 +70,7 @@ class CreateOrderDetailScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final state = ref.watch(createOrderDetailProvider);
 
     return Scaffold(
@@ -126,7 +142,7 @@ class CreateOrderDetailScreen extends ConsumerWidget {
                         ),
                         if (state.jobs.isNotEmpty)
                           TextButton.icon(
-                            onPressed: () => _openAddJobSheet(context, ref),
+                            onPressed: () => _openAddJobSheet(context),
                             icon: const Icon(
                               Icons.add,
                               size: 18,
@@ -145,7 +161,7 @@ class CreateOrderDetailScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     if (state.jobs.isEmpty)
-                      _buildEmptyJobsPrompt(context, ref)
+                      _buildEmptyJobsPrompt(context)
                     else ...[
                       ...state.jobs.map(
                         (job) => Padding(
@@ -154,7 +170,6 @@ class CreateOrderDetailScreen extends ConsumerWidget {
                             job: job,
                             onEdit: () => _openAddJobSheet(
                               context,
-                              ref,
                               existingJob: job,
                             ),
                             onDelete: () => ref
@@ -164,7 +179,7 @@ class CreateOrderDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      _buildAddJobOutlineButton(context, ref),
+                      _buildAddJobOutlineButton(context),
                     ],
                     const SizedBox(height: 24),
                     PaymentBreakdownCard(
@@ -189,11 +204,19 @@ class CreateOrderDetailScreen extends ConsumerWidget {
                     .read(createOrderDetailProvider.notifier)
                     .submitOrder();
                 if (success && context.mounted) {
-                  _handleSuccess(
-                    context,
-                    ref,
-                    context.tr('order_created_success'),
-                  );
+                  _handleSuccess(context.tr('order_created_success'));
+                } else if (!success && context.mounted) {
+                  final error =
+                      ref.read(createOrderDetailProvider).errorMessage;
+                  if (error != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(error),
+                        backgroundColor: AppColors.error,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
                 }
               },
               onSaveDraft: () async {
@@ -201,11 +224,19 @@ class CreateOrderDetailScreen extends ConsumerWidget {
                     .read(createOrderDetailProvider.notifier)
                     .submitOrder(isDraft: true);
                 if (success && context.mounted) {
-                  _handleSuccess(
-                    context,
-                    ref,
-                    context.tr('order_saved_draft'),
-                  );
+                  _handleSuccess(context.tr('order_saved_draft'));
+                } else if (!success && context.mounted) {
+                  final error =
+                      ref.read(createOrderDetailProvider).errorMessage;
+                  if (error != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(error),
+                        backgroundColor: AppColors.error,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
                 }
               },
             ),
@@ -215,7 +246,7 @@ class CreateOrderDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyJobsPrompt(BuildContext context, WidgetRef ref) {
+  Widget _buildEmptyJobsPrompt(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
@@ -251,7 +282,10 @@ class CreateOrderDetailScreen extends ConsumerWidget {
           Text(
             context.tr('empty_jobs_subtitle'),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            style: const TextStyle(
+              fontSize: 13,
+              color: AppColors.textSecondary,
+            ),
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
@@ -263,7 +297,7 @@ class CreateOrderDetailScreen extends ConsumerWidget {
               ),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            onPressed: () => _openAddJobSheet(context, ref),
+            onPressed: () => _openAddJobSheet(context),
             icon: const Icon(Icons.add, size: 18),
             label: Text(
               context.tr('btn_add_first_job'),
@@ -275,7 +309,7 @@ class CreateOrderDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAddJobOutlineButton(BuildContext context, WidgetRef ref) {
+  Widget _buildAddJobOutlineButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 48,
@@ -287,7 +321,7 @@ class CreateOrderDetailScreen extends ConsumerWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        onPressed: () => _openAddJobSheet(context, ref),
+        onPressed: () => _openAddJobSheet(context),
         icon: const Icon(Icons.add, size: 20),
         label: Text(
           context.tr('btn_add_another_job'),

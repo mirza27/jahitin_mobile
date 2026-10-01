@@ -248,13 +248,8 @@ class UpdateDetailOrder {
     );
   }
 
-  Map<String, dynamic> toPayloadJson() {
-    return {
-      "name": name ?? "",
-      "customer_id": customerId ?? 0,
-      "deadline": deadline != null ? deadline!.toIso8601String() : "",
-      "order_items": orderItems.map((e) => e.toPayloadJson()).toList(),
-    };
+  List<Map<String, dynamic>> toPayloadJson() {
+    return orderItems.map((e) => e.toPayloadJson()).toList();
   }
 
   double get totalPrice =>

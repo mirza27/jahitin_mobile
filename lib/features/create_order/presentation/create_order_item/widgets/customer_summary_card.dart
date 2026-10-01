@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/localization/app_localizations_ext.dart';
-import '../../../../../core/models/customer.dart';
+import '../../../model/customer_contact.dart';
 
 class CustomerSummaryCard extends StatelessWidget {
-  final Customer? customer;
+  final CustomerContact? customer;
   final DateTime? deadline;
   final String orderNotes;
   final VoidCallback? onEditStep1;
@@ -44,8 +44,8 @@ class CustomerSummaryCard extends StatelessWidget {
                     backgroundColor: AppColors.primaryLight,
                     radius: 18,
                     child: Text(
-                      customer != null && customer!.name.isNotEmpty
-                          ? customer!.name[0].toUpperCase()
+                      customer != null && customer!.displayName.isNotEmpty
+                          ? customer!.displayName[0].toUpperCase()
                           : '?',
                       style: const TextStyle(
                         fontSize: 14,
@@ -59,16 +59,17 @@ class CustomerSummaryCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        customer?.name ?? context.tr('no_customer_assigned'),
+                        customer?.displayName ?? context.tr('no_customer_assigned'),
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      if (customer?.phone != null)
+                      if (customer?.phoneNumber != null &&
+                          customer!.phoneNumber.isNotEmpty)
                         Text(
-                          customer!.phone,
+                          customer!.phoneNumber,
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.textSecondary,

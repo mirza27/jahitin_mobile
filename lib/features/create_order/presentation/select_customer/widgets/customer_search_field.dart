@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/localization/app_localizations_ext.dart';
-import '../../../../../core/models/customer.dart';
+import '../../../model/customer_contact.dart';
 import '../../create_order/create_order_provider.dart';
 import '../select_customer_provider.dart';
+import '../select_customer_state.dart';
 
 class CustomerSearchField extends ConsumerStatefulWidget {
   const CustomerSearchField({super.key});
@@ -17,7 +18,7 @@ class CustomerSearchField extends ConsumerStatefulWidget {
 class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
-  List<Customer> _filteredCustomers = [];
+  List<CustomerContact> _filteredCustomers = [];
   bool _isSearching = false;
 
   @override
@@ -46,14 +47,14 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
       _filteredCustomers = query.isEmpty
           ? []
           : customers.where((customer) {
-              return customer.name.toLowerCase().contains(query) ||
-                  customer.phone.contains(query);
+              return customer.displayName.toLowerCase().contains(query) ||
+                  customer.phoneNumber.contains(query);
             }).toList();
       _isSearching = query.isNotEmpty;
     });
   }
 
-  void _selectCustomer(Customer customer) {
+  void _selectCustomer(CustomerContact customer) {
     ref.read(selectCustomerProvider.notifier).selectCustomer(customer);
     ref.read(createOrderProvider.notifier).selectCustomer(customer);
     _searchController.clear();
@@ -156,7 +157,9 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedCustomer = ref.watch(selectCustomerProvider).selectedCustomer;
+    final customerState = ref.watch(selectCustomerProvider);
+    final selectedCustomer = customerState.selectedCustomer;
+    final isLoading = customerState.status == SelectCustomerStatus.loading;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,9 +167,24 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              context.tr('customer'),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Text(
+                  context.tr('customer'),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                if (isLoading) ...[
+                  const SizedBox(width: 8),
+                  const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ],
             ),
             TextButton.icon(
               onPressed: () => _showAddCustomerDialog(context),
@@ -205,13 +223,19 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
     );
   }
 
-  Widget _buildSelectedCustomerCard(Customer customer) {
+  Widget _buildSelectedCustomerCard(CustomerContact customer) {
     return Card(
       color: AppColors.surface,
       child: ListTile(
-        leading: CircleAvatar(child: Text(customer.name[0].toUpperCase())),
-        title: Text(customer.name),
-        subtitle: Text(customer.phone),
+        leading: CircleAvatar(
+          child: Text(
+            customer.displayName.isNotEmpty
+                ? customer.displayName[0].toUpperCase()
+                : '?',
+          ),
+        ),
+        title: Text(customer.displayName),
+        subtitle: Text(customer.phoneNumber),
         trailing: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () {
@@ -249,10 +273,14 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
                 final customer = _filteredCustomers[index];
                 return ListTile(
                   leading: CircleAvatar(
-                    child: Text(customer.name[0].toUpperCase()),
+                    child: Text(
+                      customer.displayName.isNotEmpty
+                          ? customer.displayName[0].toUpperCase()
+                          : '?',
+                    ),
                   ),
-                  title: Text(customer.name),
-                  subtitle: Text(customer.phone),
+                  title: Text(customer.displayName),
+                  subtitle: Text(customer.phoneNumber),
                   onTap: () => _selectCustomer(customer),
                 );
               },

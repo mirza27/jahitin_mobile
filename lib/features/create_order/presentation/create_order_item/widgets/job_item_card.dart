@@ -24,7 +24,7 @@ class JobItemCard extends StatelessWidget {
       decimalDigits: 0,
     );
 
-    final isJahitBaru = job.serviceType == ServiceType.jahitBaru;
+    final serviceText = job.serviceName;
 
     return Container(
       width: double.infinity,
@@ -54,29 +54,27 @@ class JobItemCard extends StatelessWidget {
                             color: AppColors.textPrimary,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isJahitBaru
-                                ? AppColors.primaryLight
-                                : AppColors.divider,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            job.serviceName,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: isJahitBaru
-                                  ? AppColors.primary
-                                  : AppColors.textSecondary,
+                        if (serviceText.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryLight,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              serviceText,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -149,36 +147,8 @@ class JobItemCard extends StatelessWidget {
           const Divider(height: 1, color: AppColors.divider),
           const SizedBox(height: 12),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.straighten,
-                    size: 16,
-                    color: job.measurements.isEmpty
-                        ? AppColors.textHint
-                        : AppColors.primary,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    job.measurements.isEmpty
-                        ? context.tr('measurement_empty')
-                        : context.tr(
-                            'measurement_filled_count',
-                            params: {
-                              'count': '${job.measurements.filledCount}'
-                            },
-                          ),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: job.measurements.isEmpty
-                          ? AppColors.textHint
-                          : AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
               Text(
                 currencyFormatter.format(job.estimatedCost),
                 style: const TextStyle(

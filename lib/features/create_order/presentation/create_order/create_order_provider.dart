@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/models/customer.dart';
+import '../../model/customer_contact.dart';
 import 'create_order_state.dart';
 
 class CreateOrderNotifier extends Notifier<CreateOrderState> {
@@ -8,7 +8,7 @@ class CreateOrderNotifier extends Notifier<CreateOrderState> {
     return const CreateOrderState(status: CreateOrderStatus.ready);
   }
 
-  void selectCustomer(Customer customer) {
+  void selectCustomer(CustomerContact customer) {
     state = state.copyWith(selectedCustomer: customer);
   }
 

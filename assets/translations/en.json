@@ -197,5 +197,6 @@
   "invalid_email": "Invalid email address",
   "password_required": "Password cannot be empty",
   "name_required": "Name cannot be empty",
+  "contact_permission_denied": "Contact access permission is required to select customer",
   "general_error": "An error occurred. Please try again."
 }

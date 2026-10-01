@@ -2,23 +2,29 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/models/job_item.dart';
+import '../../../detail_order/model/update_detail_order.dart';
 import 'step_a_service_selection.dart';
-import 'step_b_measurements_form.dart';
 
 class AddJobBottomSheet extends StatefulWidget {
   final JobItem? existingJob;
   final String defaultRecipientName;
+  final List<ClothesCategoryModel> categories;
+  final List<ServiceTypeModel> serviceTypes;
 
   const AddJobBottomSheet({
     super.key,
     this.existingJob,
     required this.defaultRecipientName,
+    this.categories = const [],
+    this.serviceTypes = const [],
   });
 
   static Future<JobItem?> show(
     BuildContext context, {
     JobItem? existingJob,
     required String defaultRecipientName,
+    List<ClothesCategoryModel> categories = const [],
+    List<ServiceTypeModel> serviceTypes = const [],
   }) {
     return showModalBottomSheet<JobItem>(
       context: context,
@@ -31,6 +37,8 @@ class AddJobBottomSheet extends StatefulWidget {
         child: AddJobBottomSheet(
           existingJob: existingJob,
           defaultRecipientName: defaultRecipientName,
+          categories: categories,
+          serviceTypes: serviceTypes,
         ),
       ),
     );
@@ -41,36 +49,37 @@ class AddJobBottomSheet extends StatefulWidget {
 }
 
 class _AddJobBottomSheetState extends State<AddJobBottomSheet> {
-  int _currentStep = 0;
-
-  late ServiceType _serviceType;
-  GarmentCategory? _selectedCategory;
-  late String _recipientName;
+  // --- Clothes Category (dari API atau kustom) ---
+  int? _selectedCategoryId;
+  String? _categoryName;
   String? _customCategoryName;
 
-  late BodyMeasurement _measurements;
+  // --- Service Type (dari API atau kustom) ---
+  int? _selectedServiceTypeId;
+  String? _serviceName;
+  String? _customServiceName;
+
+  // --- Penerima & Biaya & Catatan ---
+  late String _recipientName;
   double? _estimatedCost;
   String? _notes;
-  List<String> _photoPaths = [];
 
   @override
   void initState() {
     super.initState();
     final job = widget.existingJob;
     if (job != null) {
-      _serviceType = job.serviceType;
-      _selectedCategory = job.category;
-      _recipientName = job.recipientName;
+      _selectedCategoryId = job.categoryId;
+      _categoryName = job.categoryName;
       _customCategoryName = job.customCategoryName;
-      _measurements = job.measurements;
+      _selectedServiceTypeId = job.serviceTypeId;
+      _serviceName = job.serviceNameExplicit;
+      _customServiceName = job.customServiceName;
+      _recipientName = job.recipientName;
       _estimatedCost = job.estimatedCost;
       _notes = job.notes;
-      _photoPaths = List.from(job.referencePhotoPaths);
     } else {
-      _serviceType = ServiceType.jahitBaru;
-      _selectedCategory = GarmentCategory.gamis;
       _recipientName = widget.defaultRecipientName;
-      _measurements = const BodyMeasurement();
     }
   }
 
@@ -95,44 +104,56 @@ class _AddJobBottomSheetState extends State<AddJobBottomSheet> {
           Flexible(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                child: _currentStep == 0
-                    ? StepAServiceSelection(
-                        key: const ValueKey('step_a'),
-                        serviceType: _serviceType,
-                        selectedCategory: _selectedCategory,
-                        recipientName: _recipientName,
-                        customCategoryName: _customCategoryName,
-                        onServiceTypeChanged: (st) => setState(() => _serviceType = st),
-                        onCategoryChanged: (cat) => setState(() => _selectedCategory = cat),
-                        onRecipientChanged: (rec) => setState(() => _recipientName = rec),
-                        onCustomCategoryChanged: (cust) => setState(() => _customCategoryName = cust),
-                        onNext: () => setState(() => _currentStep = 1),
-                      )
-                    : StepBMeasurementsForm(
-                        key: const ValueKey('step_b'),
-                        initialMeasurements: _measurements,
-                        initialCost: _estimatedCost,
-                        initialNotes: _notes,
-                        initialPhotoPaths: _photoPaths,
-                        onBack: () => setState(() => _currentStep = 0),
-                        onSave: (data) {
-                          final finalJob = JobItem(
-                            id: widget.existingJob?.id ??
-                                DateTime.now().millisecondsSinceEpoch.toString(),
-                            serviceType: _serviceType,
-                            category: _selectedCategory ?? GarmentCategory.lainnya,
-                            recipientName: _recipientName,
-                            customCategoryName: _customCategoryName,
-                            measurements: data.measurements,
-                            estimatedCost: data.estimatedCost,
-                            notes: data.notes,
-                            referencePhotoPaths: data.photoPaths,
-                          );
-                          Navigator.of(context).pop(finalJob);
-                        },
-                      ),
+              child: StepAServiceSelection(
+                categories: widget.categories,
+                serviceTypes: widget.serviceTypes,
+                selectedCategoryId: _selectedCategoryId,
+                categoryName: _categoryName,
+                selectedServiceTypeId: _selectedServiceTypeId,
+                serviceName: _serviceName,
+                customServiceName: _customServiceName,
+                recipientName: _recipientName,
+                customCategoryName: _customCategoryName,
+                initialCost: _estimatedCost,
+                initialNotes: _notes,
+                onCategorySelected: (result) => setState(() {
+                  _selectedCategoryId = result.id;
+                  _categoryName = result.name;
+                }),
+                onServiceTypeSelected: (result) => setState(() {
+                  _selectedServiceTypeId = result.id;
+                  _serviceName = result.name;
+                }),
+                onCustomServiceNameChanged: (v) =>
+                    setState(() => _customServiceName = v),
+                onRecipientChanged: (v) =>
+                    setState(() => _recipientName = v),
+                onCustomCategoryChanged: (v) =>
+                    setState(() => _customCategoryName = v),
+                onSave: (data) {
+                  final finalJob = JobItem(
+                    id: widget.existingJob?.id ??
+                        DateTime.now().millisecondsSinceEpoch.toString(),
+                    categoryId: _selectedCategoryId,
+                    categoryName: _selectedCategoryId != null
+                        ? _categoryName
+                        : null,
+                    customCategoryName: _customCategoryName,
+                    serviceTypeId: _selectedServiceTypeId,
+                    serviceNameExplicit: _selectedServiceTypeId != null
+                        ? _serviceName
+                        : null,
+                    customServiceName: _customServiceName,
+                    recipientName: _recipientName.isNotEmpty
+                        ? _recipientName
+                        : widget.defaultRecipientName,
+                    measurements: const BodyMeasurement(),
+                    estimatedCost: data.cost,
+                    notes: data.notes,
+                    referencePhotoPaths: const [],
+                  );
+                  Navigator.of(context).pop(finalJob);
+                },
               ),
             ),
           ),
@@ -171,22 +192,9 @@ class _AddJobBottomSheetState extends State<AddJobBottomSheet> {
                   color: AppColors.textPrimary,
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  _currentStep == 0
-                      ? context.tr('step_1_2')
-                      : context.tr('step_2_2'),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
+              IconButton(
+                icon: const Icon(Icons.close, size: 20, color: AppColors.textSecondary),
+                onPressed: () => Navigator.of(context).pop(),
               ),
             ],
           ),

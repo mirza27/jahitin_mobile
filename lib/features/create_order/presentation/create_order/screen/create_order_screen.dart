@@ -5,6 +5,8 @@ import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../create_order_item/screens/create_order_detail_screen.dart';
 import '../create_order_provider.dart';
 import '../../select_customer/widgets/customer_search_field.dart';
+import '../../select_customer/select_customer_provider.dart';
+import '../../select_customer/select_customer_state.dart';
 import '../widgets/deadline_picker_section.dart';
 
 class CreateOrderScreen extends ConsumerStatefulWidget {
@@ -16,6 +18,7 @@ class CreateOrderScreen extends ConsumerStatefulWidget {
 
 class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
   final TextEditingController _notesController = TextEditingController();
+  bool _permissionChecked = false;
 
   @override
   void initState() {
@@ -24,6 +27,18 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
     _notesController.text = currentNotes;
     _notesController.addListener(() {
       ref.read(createOrderProvider.notifier).updateNotes(_notesController.text);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _requestContactPermission();
+    });
+  }
+
+  Future<void> _requestContactPermission() async {
+    await ref.read(selectCustomerProvider.notifier).checkAndLoadContacts();
+    if (!mounted) return;
+    setState(() {
+      _permissionChecked = true;
     });
   }
 
@@ -36,6 +51,21 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(createOrderProvider);
+
+    ref.listen<SelectCustomerState>(selectCustomerProvider, (previous, next) {
+      if (!_permissionChecked) return;
+      if (next.contactPermission == ContactPermission.denied ||
+          next.contactPermission == ContactPermission.permanentlyDenied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.tr('contact_permission_denied')),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    });
 
     return Scaffold(
       backgroundColor: AppColors.background,

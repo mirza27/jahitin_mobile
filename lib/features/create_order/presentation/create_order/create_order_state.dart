@@ -1,10 +1,10 @@
-import '../../../../core/models/customer.dart';
+import '../../model/customer_contact.dart';
 
 enum CreateOrderStatus { initial, loading, ready, error }
 
 class CreateOrderState {
   final CreateOrderStatus status;
-  final Customer? selectedCustomer;
+  final CustomerContact? selectedCustomer;
   final DateTime? deadline;
   final int? selectedQuickDays;
   final String notes;
@@ -23,7 +23,7 @@ class CreateOrderState {
 
   CreateOrderState copyWith({
     CreateOrderStatus? status,
-    Customer? selectedCustomer,
+    CustomerContact? selectedCustomer,
     bool clearCustomer = false,
     DateTime? deadline,
     bool clearDeadline = false,

@@ -197,5 +197,6 @@
   "invalid_email": "Format email tidak valid",
   "password_required": "Password tidak boleh kosong",
   "name_required": "Nama tidak boleh kosong",
+  "contact_permission_denied": "Izin akses kontak dibutuhkan untuk memilih pelanggan",
   "general_error": "Terjadi kesalahan. Silakan coba lagi."
 }

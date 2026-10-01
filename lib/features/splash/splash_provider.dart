@@ -28,7 +28,8 @@ class SplashNotifier extends Notifier<SplashState> {
     // Check & resolve language setting
     final storedLanguage = await storage.getLanguage();
     if (storedLanguage == null || storedLanguage.isEmpty) {
-      final osLang = ui.PlatformDispatcher.instance.locale.languageCode.toLowerCase();
+      final osLang = ui.PlatformDispatcher.instance.locale.languageCode
+          .toLowerCase();
       final resolvedLang = (osLang == 'id' || osLang == 'in')
           ? StorageLanguage.id
           : StorageLanguage.en;
