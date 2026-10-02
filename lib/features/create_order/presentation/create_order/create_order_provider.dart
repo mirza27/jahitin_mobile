@@ -8,6 +8,10 @@ class CreateOrderNotifier extends Notifier<CreateOrderState> {
     return const CreateOrderState(status: CreateOrderStatus.ready);
   }
 
+  void updateOrderName(String name) {
+    state = state.copyWith(orderName: name);
+  }
+
   void selectCustomer(CustomerContact customer) {
     state = state.copyWith(selectedCustomer: customer);
   }
@@ -18,6 +22,10 @@ class CreateOrderNotifier extends Notifier<CreateOrderState> {
 
   void setDeadline(DateTime date) {
     state = state.copyWith(deadline: date, clearQuickDays: true);
+  }
+
+  void clearDeadline() {
+    state = state.copyWith(clearDeadline: true, clearQuickDays: true);
   }
 
   void setQuickDeadline(int days) {

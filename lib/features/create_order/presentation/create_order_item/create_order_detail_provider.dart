@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jahitin_mobile/core/models/clothes_category.dart';
+import 'package:jahitin_mobile/core/models/service_type.dart';
 import '../../../../core/data/clothes_category_api.dart';
 import '../../../../core/data/order_api.dart';
 import '../../../../core/data/service_type_api.dart';
 import '../../../../core/models/job_item.dart';
 import '../../../../core/services/storage_service.dart';
-import '../../../detail_order/model/update_detail_order.dart';
 import '../../model/create_order_request.dart';
 import '../create_order/create_order_provider.dart';
 import 'create_order_detail_state.dart';
@@ -16,10 +17,13 @@ class CreateOrderDetailNotifier extends Notifier<CreateOrderDetailState> {
 
     return CreateOrderDetailState(
       status: OrderDetailStatus.ready,
+      orderName: step1State.orderName.isNotEmpty
+          ? step1State.orderName
+          : 'Pesanan Baru',
       customer: step1State.selectedCustomer,
       deadline: step1State.deadline,
       orderNotes: step1State.notes,
-      jobs: const [],
+      orderItems: const [],
       downPayment: 0,
     );
   }
@@ -54,21 +58,25 @@ class CreateOrderDetailNotifier extends Notifier<CreateOrderDetailState> {
     }
   }
 
-  void addJob(JobItem job) {
-    state = state.copyWith(jobs: [...state.jobs, job]);
+  void addOrderItem(JobItem orderItem) {
+    state = state.copyWith(orderItems: [...state.orderItems, orderItem]);
   }
 
-  void updateJob(JobItem updatedJob) {
+  void updateOrderItem(JobItem updatedOrderItem) {
     state = state.copyWith(
-      jobs: state.jobs
-          .map((j) => j.id == updatedJob.id ? updatedJob : j)
+      orderItems: state.orderItems
+          .map(
+            (item) => item.id == updatedOrderItem.id ? updatedOrderItem : item,
+          )
           .toList(),
     );
   }
 
-  void removeJob(String jobId) {
+  void removeOrderItem(String orderItemId) {
     state = state.copyWith(
-      jobs: state.jobs.where((j) => j.id != jobId).toList(),
+      orderItems: state.orderItems
+          .where((item) => item.id != orderItemId)
+          .toList(),
     );
   }
 
@@ -77,24 +85,27 @@ class CreateOrderDetailNotifier extends Notifier<CreateOrderDetailState> {
   }
 
   CreateOrderRequest buildCreateOrderRequest({bool isDraft = false}) {
-    final orderName = state.orderNotes.isNotEmpty
-        ? state.orderNotes
-        : (state.customer?.displayName ?? 'Pesanan');
+    final orderName = state.orderName.isNotEmpty
+        ? state.orderName
+        : (state.orderNotes.isNotEmpty
+              ? state.orderNotes
+              : (state.customer?.displayName ?? 'Pesanan'));
 
     final deadlineStr = state.deadline != null
         ? state.deadline!.toIso8601String()
-        : DateTime.now().toIso8601String();
+        : '';
 
-    final orderItems = state.jobs.map((job) {
+    final orderItems = state.orderItems.map((item) {
       return CreateOrderItemRequest(
-        clothesFor: job.recipientName.isNotEmpty
-            ? job.recipientName
+        clothesFor: item.recipientName.isNotEmpty
+            ? item.recipientName
             : (state.customer?.displayName ?? ''),
-        notes: job.notes ?? '',
-        categoryId: job.resolvedCategoryId,
-        serviceId: job.resolvedServiceTypeId,
-        customServiceName: job.customServiceName ?? job.customCategoryName ?? '',
-        price: job.estimatedCost,
+        notes: item.notes ?? '',
+        categoryId: item.resolvedCategoryId,
+        serviceId: item.resolvedServiceTypeId,
+        customServiceName:
+            item.customServiceName ?? item.customCategoryName ?? '',
+        price: item.estimatedCost,
         saveCustomerNotes: false,
       );
     }).toList();

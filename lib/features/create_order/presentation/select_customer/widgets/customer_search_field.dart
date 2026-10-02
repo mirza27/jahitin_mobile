@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/constants/app_colors.dart';
@@ -20,6 +22,8 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
   final _focusNode = FocusNode();
   List<CustomerContact> _filteredCustomers = [];
   bool _isSearching = false;
+  bool _isFiltering = false;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -34,6 +38,7 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     _focusNode.dispose();
@@ -41,16 +46,39 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
   }
 
   void _onSearchChanged() {
-    final query = _searchController.text.trim().toLowerCase();
-    final customers = ref.read(selectCustomerProvider).customers;
+    final query = _searchController.text.trim();
+
+    if (query.isEmpty) {
+      _debounce?.cancel();
+      setState(() {
+        _filteredCustomers = [];
+        _isSearching = false;
+        _isFiltering = false;
+      });
+      return;
+    }
+
+    // Show searching state immediately for responsive feedback
     setState(() {
-      _filteredCustomers = query.isEmpty
-          ? []
-          : customers.where((customer) {
-              return customer.displayName.toLowerCase().contains(query) ||
-                  customer.phoneNumber.contains(query);
-            }).toList();
-      _isSearching = query.isNotEmpty;
+      _isSearching = true;
+      _isFiltering = true;
+    });
+
+    // Debounce the actual filtering to avoid blocking on every keystroke
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      final customers = ref.read(selectCustomerProvider).customers;
+      final lowerQuery = query.toLowerCase();
+      final results = customers.where((customer) {
+        return customer.displayName.toLowerCase().contains(lowerQuery) ||
+            customer.phoneNumber.contains(lowerQuery);
+      }).toList();
+
+      setState(() {
+        _filteredCustomers = results;
+        _isFiltering = false;
+      });
     });
   }
 
@@ -166,25 +194,45 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Text(
-                  context.tr('customer'),
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                if (isLoading) ...[
-                  const SizedBox(width: 8),
-                  const SizedBox(
-                    width: 14,
-                    height: 14,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.primary,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        context.tr('customer'),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      if (isLoading) ...[
+                        const SizedBox(width: 8),
+                        const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    context.tr('customer_subtitle'),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ],
-              ],
+              ),
             ),
             TextButton.icon(
               onPressed: () => _showAddCustomerDialog(context),
@@ -193,7 +241,7 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         if (selectedCustomer != null)
           _buildSelectedCustomerCard(selectedCustomer)
         else
@@ -256,35 +304,49 @@ class _CustomerSearchFieldState extends ConsumerState<CustomerSearchField> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
-      child: _filteredCustomers.isEmpty
-          ? ListTile(
-              title: Text(context.tr('customer_not_found')),
-              trailing: TextButton(
-                onPressed: () => _showAddCustomerDialog(context),
-                child: Text(context.tr('add_new')),
+      child: _isFiltering
+          ? const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: AppColors.primary,
+                  ),
+                ),
               ),
             )
-          : ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _filteredCustomers.length,
-              separatorBuilder: (_, index) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final customer = _filteredCustomers[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    child: Text(
-                      customer.displayName.isNotEmpty
-                          ? customer.displayName[0].toUpperCase()
-                          : '?',
-                    ),
+          : _filteredCustomers.isEmpty
+              ? ListTile(
+                  title: Text(context.tr('customer_not_found')),
+                  trailing: TextButton(
+                    onPressed: () => _showAddCustomerDialog(context),
+                    child: Text(context.tr('add_new')),
                   ),
-                  title: Text(customer.displayName),
-                  subtitle: Text(customer.phoneNumber),
-                  onTap: () => _selectCustomer(customer),
-                );
-              },
-            ),
+                )
+              : ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _filteredCustomers.length,
+                  separatorBuilder: (_, index) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final customer = _filteredCustomers[index];
+                    return ListTile(
+                      leading: CircleAvatar(
+                        child: Text(
+                          customer.displayName.isNotEmpty
+                              ? customer.displayName[0].toUpperCase()
+                              : '?',
+                        ),
+                      ),
+                      title: Text(customer.displayName),
+                      subtitle: Text(customer.phoneNumber),
+                      onTap: () => _selectCustomer(customer),
+                    );
+                  },
+                ),
     );
   }
 }

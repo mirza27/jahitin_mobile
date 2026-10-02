@@ -1,15 +1,18 @@
+import 'package:jahitin_mobile/core/models/clothes_category.dart';
+import 'package:jahitin_mobile/core/models/service_type.dart';
+
 import '../../../../core/models/job_item.dart';
-import '../../../detail_order/model/update_detail_order.dart';
 import '../../model/customer_contact.dart';
 
 enum OrderDetailStatus { initial, loading, ready, submitting, success, error }
 
 class CreateOrderDetailState {
   final OrderDetailStatus status;
+  final String orderName;
   final CustomerContact? customer;
   final DateTime? deadline;
   final String orderNotes;
-  final List<JobItem> jobs;
+  final List<JobItem> orderItems;
   final double downPayment;
   final String? errorMessage;
   final List<ClothesCategoryModel> clothesCategories;
@@ -19,10 +22,11 @@ class CreateOrderDetailState {
 
   const CreateOrderDetailState({
     this.status = OrderDetailStatus.ready,
+    this.orderName = '',
     this.customer,
     this.deadline,
     this.orderNotes = '',
-    this.jobs = const [],
+    this.orderItems = const [],
     this.downPayment = 0,
     this.errorMessage,
     this.clothesCategories = const [],
@@ -32,23 +36,23 @@ class CreateOrderDetailState {
   });
 
   double get totalCost =>
-      jobs.fold(0.0, (sum, item) => sum + item.estimatedCost);
+      orderItems.fold(0.0, (sum, item) => sum + item.estimatedCost);
 
   double get remainingBalance =>
       (totalCost - downPayment).clamp(0.0, double.infinity);
 
   bool get canSubmit =>
       customer != null &&
-      deadline != null &&
-      jobs.isNotEmpty &&
+      orderItems.isNotEmpty &&
       status != OrderDetailStatus.submitting;
 
   CreateOrderDetailState copyWith({
     OrderDetailStatus? status,
+    String? orderName,
     CustomerContact? customer,
     DateTime? deadline,
     String? orderNotes,
-    List<JobItem>? jobs,
+    List<JobItem>? orderItems,
     double? downPayment,
     String? errorMessage,
     List<ClothesCategoryModel>? clothesCategories,
@@ -58,10 +62,11 @@ class CreateOrderDetailState {
   }) {
     return CreateOrderDetailState(
       status: status ?? this.status,
+      orderName: orderName ?? this.orderName,
       customer: customer ?? this.customer,
       deadline: deadline ?? this.deadline,
       orderNotes: orderNotes ?? this.orderNotes,
-      jobs: jobs ?? this.jobs,
+      orderItems: orderItems ?? this.orderItems,
       downPayment: downPayment ?? this.downPayment,
       errorMessage: errorMessage ?? this.errorMessage,
       clothesCategories: clothesCategories ?? this.clothesCategories,
@@ -71,4 +76,3 @@ class CreateOrderDetailState {
     );
   }
 }
-

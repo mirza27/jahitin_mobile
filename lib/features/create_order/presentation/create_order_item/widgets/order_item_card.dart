@@ -4,14 +4,14 @@ import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../../../core/models/job_item.dart';
 
-class JobItemCard extends StatelessWidget {
-  final JobItem job;
+class OrderItemCard extends StatelessWidget {
+  final JobItem item;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
-  const JobItemCard({
+  const OrderItemCard({
     super.key,
-    required this.job,
+    required this.item,
     required this.onEdit,
     required this.onDelete,
   });
@@ -24,7 +24,7 @@ class JobItemCard extends StatelessWidget {
       decimalDigits: 0,
     );
 
-    final serviceText = job.serviceName;
+    final serviceText = item.serviceName;
 
     return Container(
       width: double.infinity,
@@ -47,7 +47,7 @@ class JobItemCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          job.displayName,
+                          item.displayName,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -81,7 +81,7 @@ class JobItemCard extends StatelessWidget {
                     Text(
                       context.tr(
                         'for_recipient_prefix',
-                        params: {'name': job.recipientName},
+                        params: {'name': item.recipientName},
                       ),
                       style: const TextStyle(
                         fontSize: 13,
@@ -150,7 +150,7 @@ class JobItemCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                currencyFormatter.format(job.estimatedCost),
+                currencyFormatter.format(item.estimatedCost),
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -159,7 +159,7 @@ class JobItemCard extends StatelessWidget {
               ),
             ],
           ),
-          if (job.notes != null && job.notes!.isNotEmpty) ...[
+          if (item.notes != null && item.notes!.isNotEmpty) ...[
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -177,7 +177,7 @@ class JobItemCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      job.notes!,
+                      item.notes!,
                       style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,

@@ -6,14 +6,12 @@ class BottomActionBar extends StatelessWidget {
   final bool canSubmit;
   final bool isSubmitting;
   final VoidCallback onCreateOrder;
-  final VoidCallback onSaveDraft;
 
   const BottomActionBar({
     super.key,
     required this.canSubmit,
     required this.isSubmitting,
     required this.onCreateOrder,
-    required this.onSaveDraft,
   });
 
   @override
@@ -30,63 +28,38 @@ class BottomActionBar extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 4,
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              onPressed: isSubmitting ? null : onSaveDraft,
-              child: Text(
-                context.tr('btn_save_draft'),
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              ),
+      child: SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: canSubmit ? AppColors.primary : AppColors.border,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: AppColors.border,
+            disabledForegroundColor: AppColors.textHint,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            flex: 6,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: canSubmit
-                    ? AppColors.primary
-                    : AppColors.border,
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: AppColors.border,
-                disabledForegroundColor: AppColors.textHint,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          onPressed: (canSubmit && !isSubmitting) ? onCreateOrder : null,
+          child: isSubmitting
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  context.tr('btn_create_order'),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              onPressed: (canSubmit && !isSubmitting) ? onCreateOrder : null,
-              child: isSubmitting
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(
-                      context.tr('btn_create_order'),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

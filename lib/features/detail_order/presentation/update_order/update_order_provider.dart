@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jahitin_mobile/core/models/clothes_category.dart';
+import 'package:jahitin_mobile/core/models/service_type.dart';
 import '../../../../core/data/clothes_category_api.dart';
 import '../../../../core/data/order_api.dart';
 import '../../../../core/data/service_type_api.dart';
@@ -54,13 +56,12 @@ class UpdateOrderNotifier
     );
     currentItems.add(item);
 
-    final updated = state.updatedDetailOrder!.copyWith(orderItems: currentItems);
+    final updated = state.updatedDetailOrder!.copyWith(
+      orderItems: currentItems,
+    );
     final dirty = _checkDirty(updated);
 
-    state = state.copyWith(
-      updatedDetailOrder: updated,
-      anyChanges: dirty,
-    );
+    state = state.copyWith(updatedDetailOrder: updated, anyChanges: dirty);
   }
 
   void updateJobItem(int index, UpdateOrderItem item) {
@@ -71,13 +72,12 @@ class UpdateOrderNotifier
     if (index < 0 || index >= currentItems.length) return;
 
     currentItems[index] = item;
-    final updated = state.updatedDetailOrder!.copyWith(orderItems: currentItems);
+    final updated = state.updatedDetailOrder!.copyWith(
+      orderItems: currentItems,
+    );
     final dirty = _checkDirty(updated);
 
-    state = state.copyWith(
-      updatedDetailOrder: updated,
-      anyChanges: dirty,
-    );
+    state = state.copyWith(updatedDetailOrder: updated, anyChanges: dirty);
   }
 
   void removeJobItem(int index) {
@@ -88,13 +88,12 @@ class UpdateOrderNotifier
     if (index < 0 || index >= currentItems.length) return;
 
     currentItems.removeAt(index);
-    final updated = state.updatedDetailOrder!.copyWith(orderItems: currentItems);
+    final updated = state.updatedDetailOrder!.copyWith(
+      orderItems: currentItems,
+    );
     final dirty = _checkDirty(updated);
 
-    state = state.copyWith(
-      updatedDetailOrder: updated,
-      anyChanges: dirty,
-    );
+    state = state.copyWith(updatedDetailOrder: updated, anyChanges: dirty);
   }
 
   void updateItemStatus(int index, String newStatus) {
@@ -105,13 +104,12 @@ class UpdateOrderNotifier
     if (index < 0 || index >= currentItems.length) return;
 
     currentItems[index] = currentItems[index].copyWith(status: newStatus);
-    final updated = state.updatedDetailOrder!.copyWith(orderItems: currentItems);
+    final updated = state.updatedDetailOrder!.copyWith(
+      orderItems: currentItems,
+    );
     final dirty = _checkDirty(updated);
 
-    state = state.copyWith(
-      updatedDetailOrder: updated,
-      anyChanges: dirty,
-    );
+    state = state.copyWith(updatedDetailOrder: updated, anyChanges: dirty);
   }
 
   bool _checkDirty(UpdateDetailOrder updated) {
@@ -123,7 +121,10 @@ class UpdateOrderNotifier
   Future<bool> submitUpdate() async {
     if (state.updatedDetailOrder == null) return false;
 
-    state = state.copyWith(status: UpdateOrderStatus.updating, errorMessage: null);
+    state = state.copyWith(
+      status: UpdateOrderStatus.updating,
+      errorMessage: null,
+    );
 
     try {
       final storage = ref.read(storageServiceProvider);
@@ -132,11 +133,7 @@ class UpdateOrderNotifier
       final orderApi = ref.read(orderApiProvider);
       final payload = state.updatedDetailOrder!.toPayloadJson();
 
-      await orderApi.updateOrder(
-        state.orderId,
-        payload,
-        token: token,
-      );
+      await orderApi.updateOrder(state.orderId, payload, token: token);
 
       state = state.copyWith(
         status: UpdateOrderStatus.success,
@@ -156,5 +153,5 @@ class UpdateOrderNotifier
 
 final updateOrderProvider = NotifierProvider.autoDispose
     .family<UpdateOrderNotifier, UpdateOrderState, DetailOrder>(
-  UpdateOrderNotifier.new,
-);
+      UpdateOrderNotifier.new,
+    );

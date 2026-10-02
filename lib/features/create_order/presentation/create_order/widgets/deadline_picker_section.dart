@@ -71,6 +71,14 @@ class DeadlinePickerSection extends ConsumerWidget {
             color: AppColors.textPrimary,
           ),
         ),
+        const SizedBox(height: 4),
+        Text(
+          context.tr('target_deadline_subtitle'),
+          style: const TextStyle(
+            fontSize: 12,
+            color: AppColors.textSecondary,
+          ),
+        ),
         const SizedBox(height: 12),
         Row(
           children: _quickOptions.map((opt) {
@@ -80,9 +88,16 @@ class DeadlinePickerSection extends ConsumerWidget {
               child: QuickDateChip(
                 label: context.tr(opt.key),
                 isSelected: isSelected,
-                onTap: () => ref
-                    .read(createOrderProvider.notifier)
-                    .setQuickDeadline(opt.days),
+                onTap: () {
+                  if (isSelected) {
+                    // tap ulang chip aktif → hapus deadline
+                    ref.read(createOrderProvider.notifier).clearDeadline();
+                  } else {
+                    ref
+                        .read(createOrderProvider.notifier)
+                        .setQuickDeadline(opt.days);
+                  }
+                },
               ),
             );
           }).toList(),
@@ -127,13 +142,22 @@ class DeadlinePickerSection extends ConsumerWidget {
                     ),
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right,
-                  size: 20,
-                  color: deadline != null
-                      ? AppColors.primary
-                      : AppColors.textHint,
-                ),
+                if (deadline != null)
+                  GestureDetector(
+                    onTap: () =>
+                        ref.read(createOrderProvider.notifier).clearDeadline(),
+                    child: const Icon(
+                      Icons.close,
+                      size: 18,
+                      color: AppColors.textSecondary,
+                    ),
+                  )
+                else
+                  const Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: AppColors.textHint,
+                  ),
               ],
             ),
           ),

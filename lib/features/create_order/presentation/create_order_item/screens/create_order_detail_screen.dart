@@ -4,12 +4,12 @@ import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../../../core/models/job_item.dart';
 import '../../create_order/create_order_provider.dart';
-import '../../../widgets/add_job_sheet/add_job_bottom_sheet.dart';
+import '../../handle_order_item/handle_order_item_bottom_sheet.dart';
 import '../create_order_detail_provider.dart';
 import '../create_order_detail_state.dart';
 import '../widgets/bottom_action_bar.dart';
 import '../widgets/customer_summary_card.dart';
-import '../widgets/job_item_card.dart';
+import '../widgets/order_item_card.dart';
 import '../widgets/payment_breakdown_card.dart';
 
 class CreateOrderDetailScreen extends ConsumerStatefulWidget {
@@ -30,26 +30,26 @@ class _CreateOrderDetailScreenState
     });
   }
 
-  Future<void> _openAddJobSheet(
+  Future<void> _openAddOrderItemSheet(
     BuildContext context, {
-    JobItem? existingJob,
+    JobItem? existingOrderItem,
   }) async {
     final state = ref.read(createOrderDetailProvider);
     final defaultRecipient = state.customer?.displayName ?? '';
 
-    final result = await AddJobBottomSheet.show(
+    final result = await HandleOrderItemBottomSheet.show(
       context,
-      existingJob: existingJob,
+      existingOrderItem: existingOrderItem,
       defaultRecipientName: defaultRecipient,
       categories: state.clothesCategories,
       serviceTypes: state.serviceTypes,
     );
 
     if (result != null) {
-      if (existingJob != null) {
-        ref.read(createOrderDetailProvider.notifier).updateJob(result);
+      if (existingOrderItem != null) {
+        ref.read(createOrderDetailProvider.notifier).updateOrderItem(result);
       } else {
-        ref.read(createOrderDetailProvider.notifier).addJob(result);
+        ref.read(createOrderDetailProvider.notifier).addOrderItem(result);
       }
     }
   }
@@ -120,6 +120,7 @@ class _CreateOrderDetailScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomerSummaryCard(
+                      orderName: state.orderName,
                       customer: state.customer,
                       deadline: state.deadline,
                       orderNotes: state.orderNotes,
@@ -132,7 +133,7 @@ class _CreateOrderDetailScreenState
                         Text(
                           context.tr(
                             'job_list_with_count',
-                            params: {'count': '${state.jobs.length}'},
+                            params: {'count': '${state.orderItems.length}'},
                           ),
                           style: const TextStyle(
                             fontSize: 16,
@@ -140,9 +141,9 @@ class _CreateOrderDetailScreenState
                             color: AppColors.textPrimary,
                           ),
                         ),
-                        if (state.jobs.isNotEmpty)
+                        if (state.orderItems.isNotEmpty)
                           TextButton.icon(
-                            onPressed: () => _openAddJobSheet(context),
+                            onPressed: () => _openAddOrderItemSheet(context),
                             icon: const Icon(
                               Icons.add,
                               size: 18,
@@ -160,37 +161,30 @@ class _CreateOrderDetailScreenState
                       ],
                     ),
                     const SizedBox(height: 12),
-                    if (state.jobs.isEmpty)
-                      _buildEmptyJobsPrompt(context)
+                    if (state.orderItems.isEmpty)
+                      _buildEmptyOrderItemsPrompt(context)
                     else ...[
-                      ...state.jobs.map(
-                        (job) => Padding(
+                      ...state.orderItems.map(
+                        (orderItem) => Padding(
                           padding: const EdgeInsets.only(bottom: 12),
-                          child: JobItemCard(
-                            job: job,
-                            onEdit: () => _openAddJobSheet(
+                          child: OrderItemCard(
+                            item: orderItem,
+                            onEdit: () => _openAddOrderItemSheet(
                               context,
-                              existingJob: job,
+                              existingOrderItem: orderItem,
                             ),
                             onDelete: () => ref
                                 .read(createOrderDetailProvider.notifier)
-                                .removeJob(job.id),
+                                .removeOrderItem(orderItem.id),
                           ),
                         ),
                       ),
                       const SizedBox(height: 8),
-                      _buildAddJobOutlineButton(context),
+                      _buildAddOrderItemOutlineButton(context),
                     ],
                     const SizedBox(height: 24),
                     PaymentBreakdownCard(
                       totalCost: state.totalCost,
-                      downPayment: state.downPayment,
-                      remainingBalance: state.remainingBalance,
-                      onDownPaymentChanged: (val) {
-                        ref
-                            .read(createOrderDetailProvider.notifier)
-                            .setDownPayment(val);
-                      },
                     ),
                   ],
                 ),
@@ -206,28 +200,9 @@ class _CreateOrderDetailScreenState
                 if (success && context.mounted) {
                   _handleSuccess(context.tr('order_created_success'));
                 } else if (!success && context.mounted) {
-                  final error =
-                      ref.read(createOrderDetailProvider).errorMessage;
-                  if (error != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(error),
-                        backgroundColor: AppColors.error,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
-                }
-              },
-              onSaveDraft: () async {
-                final success = await ref
-                    .read(createOrderDetailProvider.notifier)
-                    .submitOrder(isDraft: true);
-                if (success && context.mounted) {
-                  _handleSuccess(context.tr('order_saved_draft'));
-                } else if (!success && context.mounted) {
-                  final error =
-                      ref.read(createOrderDetailProvider).errorMessage;
+                  final error = ref
+                      .read(createOrderDetailProvider)
+                      .errorMessage;
                   if (error != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -246,7 +221,7 @@ class _CreateOrderDetailScreenState
     );
   }
 
-  Widget _buildEmptyJobsPrompt(BuildContext context) {
+  Widget _buildEmptyOrderItemsPrompt(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
@@ -297,7 +272,7 @@ class _CreateOrderDetailScreenState
               ),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            onPressed: () => _openAddJobSheet(context),
+            onPressed: () => _openAddOrderItemSheet(context),
             icon: const Icon(Icons.add, size: 18),
             label: Text(
               context.tr('btn_add_first_job'),
@@ -309,7 +284,7 @@ class _CreateOrderDetailScreenState
     );
   }
 
-  Widget _buildAddJobOutlineButton(BuildContext context) {
+  Widget _buildAddOrderItemOutlineButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 48,
@@ -321,7 +296,7 @@ class _CreateOrderDetailScreenState
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        onPressed: () => _openAddJobSheet(context),
+        onPressed: () => _openAddOrderItemSheet(context),
         icon: const Icon(Icons.add, size: 20),
         label: Text(
           context.tr('btn_add_another_job'),

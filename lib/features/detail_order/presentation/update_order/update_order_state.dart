@@ -1,3 +1,6 @@
+import 'package:jahitin_mobile/core/models/clothes_category.dart';
+import 'package:jahitin_mobile/core/models/service_type.dart';
+
 import '../../model/update_detail_order.dart';
 
 enum UpdateOrderStatus { initial, loading, loaded, updating, success, error }

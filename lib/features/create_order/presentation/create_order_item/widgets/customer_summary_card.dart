@@ -5,6 +5,7 @@ import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../model/customer_contact.dart';
 
 class CustomerSummaryCard extends StatelessWidget {
+  final String orderName;
   final CustomerContact? customer;
   final DateTime? deadline;
   final String orderNotes;
@@ -12,6 +13,7 @@ class CustomerSummaryCard extends StatelessWidget {
 
   const CustomerSummaryCard({
     super.key,
+    required this.orderName,
     required this.customer,
     required this.deadline,
     required this.orderNotes,
@@ -22,7 +24,7 @@ class CustomerSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final deadlineFormatted = deadline != null
         ? DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(deadline!)
-        : '-';
+        : context.tr('target_deadline_none');
 
     return Container(
       width: double.infinity,
@@ -94,6 +96,33 @@ class CustomerSummaryCard extends StatelessWidget {
           const SizedBox(height: 12),
           const Divider(height: 1, color: AppColors.divider),
           const SizedBox(height: 12),
+          if (orderName.isNotEmpty) ...[
+            Row(
+              children: [
+                const Icon(
+                  Icons.shopping_bag_outlined,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  context.tr('order_name_label'),
+                  style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                ),
+                Expanded(
+                  child: Text(
+                    orderName,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
           Row(
             children: [
               const Icon(

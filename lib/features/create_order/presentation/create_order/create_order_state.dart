@@ -4,6 +4,7 @@ enum CreateOrderStatus { initial, loading, ready, error }
 
 class CreateOrderState {
   final CreateOrderStatus status;
+  final String orderName;
   final CustomerContact? selectedCustomer;
   final DateTime? deadline;
   final int? selectedQuickDays;
@@ -12,6 +13,7 @@ class CreateOrderState {
 
   const CreateOrderState({
     this.status = CreateOrderStatus.initial,
+    this.orderName = '',
     this.selectedCustomer,
     this.deadline,
     this.selectedQuickDays,
@@ -19,10 +21,16 @@ class CreateOrderState {
     this.errorMessage,
   });
 
-  bool get isValid => selectedCustomer != null && deadline != null;
+  bool get isValid =>
+      orderName.trim().isNotEmpty && selectedCustomer != null;
+
+  /// Deadline bersifat opsional; gunakan string kosong jika null
+  String get deadlineOrEmpty =>
+      deadline != null ? deadline!.toIso8601String() : '';
 
   CreateOrderState copyWith({
     CreateOrderStatus? status,
+    String? orderName,
     CustomerContact? selectedCustomer,
     bool clearCustomer = false,
     DateTime? deadline,
@@ -34,6 +42,7 @@ class CreateOrderState {
   }) {
     return CreateOrderState(
       status: status ?? this.status,
+      orderName: orderName ?? this.orderName,
       selectedCustomer: clearCustomer
           ? null
           : (selectedCustomer ?? this.selectedCustomer),

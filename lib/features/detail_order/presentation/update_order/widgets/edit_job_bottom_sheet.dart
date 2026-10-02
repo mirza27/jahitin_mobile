@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jahitin_mobile/core/models/clothes_category.dart';
+import 'package:jahitin_mobile/core/models/service_type.dart';
 import '../../../../../../core/constants/app_colors.dart';
 import '../../../../../../core/localization/app_localizations_ext.dart';
 import '../../../model/update_detail_order.dart';
@@ -91,7 +93,8 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
       _selectedServiceId = int.tryParse(item.serviceId!);
       _selectedServiceName = item.serviceName;
     }
-    if (item?.customServiceName != null && item!.customServiceName!.isNotEmpty) {
+    if (item?.customServiceName != null &&
+        item!.customServiceName!.isNotEmpty) {
       _isCustomService = true;
     }
   }
@@ -138,7 +141,8 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
     final customServiceVal = _customServiceController.text.trim();
 
     final result = UpdateOrderItem(
-      localId: widget.initialItem?.localId ??
+      localId:
+          widget.initialItem?.localId ??
           'item_${DateTime.now().millisecondsSinceEpoch}',
       clothesFor: clothesForVal.isNotEmpty ? clothesForVal : null,
       notes: notesVal.isNotEmpty ? notesVal : null,
@@ -254,8 +258,11 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: widget.categories.map((cat) {
-                          final isSelected = _selectedCategoryId == cat.id ||
-                              _clothesCategoryController.text.trim().toLowerCase() ==
+                          final isSelected =
+                              _selectedCategoryId == cat.id ||
+                              _clothesCategoryController.text
+                                      .trim()
+                                      .toLowerCase() ==
                                   cat.name.toLowerCase();
                           return Padding(
                             padding: const EdgeInsets.only(right: 6),
@@ -448,7 +455,10 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                       prefixIcon: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         child: Text(
                           'Rp',
                           style: TextStyle(
@@ -458,7 +468,10 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
                           ),
                         ),
                       ),
-                      prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+                      prefixIconConstraints: const BoxConstraints(
+                        minWidth: 0,
+                        minHeight: 0,
+                      ),
                       hintText: '50000',
                       hintStyle: const TextStyle(
                         fontSize: 14,
@@ -546,7 +559,8 @@ class _EditJobBottomSheetState extends State<EditJobBottomSheet> {
           final isSelected = isLainnya
               ? _isCustomService
               : (!_isCustomService &&
-                  _selectedServiceName?.toLowerCase() == item['name']!.toLowerCase());
+                    _selectedServiceName?.toLowerCase() ==
+                        item['name']!.toLowerCase());
           return _buildChip(
             label: context.tr(item['key']!),
             isSelected: isSelected,

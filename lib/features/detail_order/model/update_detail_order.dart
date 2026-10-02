@@ -1,87 +1,5 @@
 import 'detail_order.dart';
 
-class ClothesCategoryModel {
-  final int id;
-  final String name;
-  final DateTime? createdAt;
-
-  ClothesCategoryModel({
-    required this.id,
-    required this.name,
-    this.createdAt,
-  });
-
-  factory ClothesCategoryModel.fromJson(Map<String, dynamic> json) {
-    return ClothesCategoryModel(
-      id: json['id'] is int ? json['id'] as int : int.parse(json['id'].toString()),
-      name: json['name'] as String? ?? '',
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
-          : null,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'created_at': createdAt?.toIso8601String(),
-    };
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ClothesCategoryModel &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name;
-
-  @override
-  int get hashCode => id.hashCode ^ name.hashCode;
-}
-
-class ServiceTypeModel {
-  final int id;
-  final String name;
-  final DateTime? createdAt;
-
-  ServiceTypeModel({
-    required this.id,
-    required this.name,
-    this.createdAt,
-  });
-
-  factory ServiceTypeModel.fromJson(Map<String, dynamic> json) {
-    return ServiceTypeModel(
-      id: json['id'] is int ? json['id'] as int : int.parse(json['id'].toString()),
-      name: json['name'] as String? ?? '',
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
-          : null,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'created_at': createdAt?.toIso8601String(),
-    };
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ServiceTypeModel &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name;
-
-  @override
-  int get hashCode => id.hashCode ^ name.hashCode;
-}
-
 class UpdateOrderItem {
   final String localId; // Digunakan sebagai key identifikasi lokal pada list
   final String? clothesFor;
@@ -137,7 +55,10 @@ class UpdateOrderItem {
     );
   }
 
-  factory UpdateOrderItem.fromDetailOrderItem(DetailOrderItem item, String localId) {
+  factory UpdateOrderItem.fromDetailOrderItem(
+    DetailOrderItem item,
+    String localId,
+  ) {
     return UpdateOrderItem(
       localId: localId,
       clothesFor: item.clothesFor,
@@ -240,10 +161,12 @@ class UpdateDetailOrder {
       orderItems: detailOrder.items
           .asMap()
           .entries
-          .map((entry) => UpdateOrderItem.fromDetailOrderItem(
-                entry.value,
-                'item_${entry.key}_${DateTime.now().millisecondsSinceEpoch}',
-              ))
+          .map(
+            (entry) => UpdateOrderItem.fromDetailOrderItem(
+              entry.value,
+              'item_${entry.key}_${DateTime.now().millisecondsSinceEpoch}',
+            ),
+          )
           .toList(),
     );
   }

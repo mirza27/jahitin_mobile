@@ -17,12 +17,21 @@ class CreateOrderScreen extends ConsumerStatefulWidget {
 }
 
 class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
+  final TextEditingController _orderNameController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
   bool _permissionChecked = false;
 
   @override
   void initState() {
     super.initState();
+    final currentOrderName = ref.read(createOrderProvider).orderName;
+    _orderNameController.text = currentOrderName;
+    _orderNameController.addListener(() {
+      ref
+          .read(createOrderProvider.notifier)
+          .updateOrderName(_orderNameController.text);
+    });
+
     final currentNotes = ref.read(createOrderProvider).notes;
     _notesController.text = currentNotes;
     _notesController.addListener(() {
@@ -30,6 +39,11 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_orderNameController.text.trim().isEmpty) {
+        final defaultName = context.tr('default_order_name');
+        _orderNameController.text = defaultName;
+        ref.read(createOrderProvider.notifier).updateOrderName(defaultName);
+      }
       _requestContactPermission();
     });
   }
@@ -44,6 +58,7 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
 
   @override
   void dispose() {
+    _orderNameController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -113,6 +128,51 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      context.tr('order_name'),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      context.tr('order_name_subtitle'),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _orderNameController,
+                      decoration: InputDecoration(
+                        hintText: context.tr('order_name_hint'),
+                        hintStyle: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textHint,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.surface,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                     const CustomerSearchField(),
                     const SizedBox(height: 24),
                     const DeadlinePickerSection(),
