@@ -1,0 +1,12 @@
+{
+  "conventionalCommits.scopes": [
+    "Registration",
+    "Auth",
+    "Create Order",
+    "Home",
+    "Storage",
+    "Detail Order",
+    "Minor",
+    "Localization"
+  ]
+}
