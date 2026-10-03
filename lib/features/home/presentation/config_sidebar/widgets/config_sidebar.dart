@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/localization/app_localizations_ext.dart';
-import '../presentation/home/home_provider.dart';
+import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/localization/app_localizations_ext.dart';
+import '../../home/home_provider.dart';
+import '../../settings/screens/settings_screen.dart';
+import '../config_sidebar_provider.dart';
 
 class ConfigSidebar extends ConsumerWidget {
   const ConfigSidebar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final sidebarState = ref.watch(configSidebarProvider);
+    final isOpen = sidebarState.isOpen;
     final homeState = ref.watch(homeProvider);
-    final isOpen = homeState.sidebarActive;
     final user = homeState.user;
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -27,7 +30,7 @@ class ConfigSidebar extends ConsumerWidget {
             curve: Curves.easeInOut,
             child: GestureDetector(
               onTap: () =>
-                  ref.read(homeProvider.notifier).setSidebarActive(false),
+                  ref.read(configSidebarProvider.notifier).setOpen(false),
               child: Container(
                 color: Colors.black45,
                 width: double.infinity,
@@ -60,22 +63,29 @@ class ConfigSidebar extends ConsumerWidget {
                       child: ListView(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         children: [
-                          _buildMenuItem(
-                            icon: Icons.person_outline,
-                            title: context.tr('account'),
-                            onTap: () {
-                              ref
-                                  .read(homeProvider.notifier)
-                                  .setSidebarActive(false);
-                            },
-                          ),
+                          // Menu Akun (Disabled / Commented)
+                          // _buildMenuItem(
+                          //   icon: Icons.person_outline,
+                          //   title: context.tr('account'),
+                          //   onTap: () {
+                          //     ref
+                          //         .read(configSidebarProvider.notifier)
+                          //         .setOpen(false);
+                          //   },
+                          // ),
                           _buildMenuItem(
                             icon: Icons.settings_outlined,
                             title: context.tr('settings'),
                             onTap: () {
                               ref
-                                  .read(homeProvider.notifier)
-                                  .setSidebarActive(false);
+                                  .read(configSidebarProvider.notifier)
+                                  .setOpen(false);
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const SettingsScreen(),
+                                ),
+                              );
                             },
                           ),
                         ],
@@ -160,7 +170,7 @@ class ConfigSidebar extends ConsumerWidget {
               size: 20,
             ),
             onPressed: () =>
-                ref.read(homeProvider.notifier).setSidebarActive(false),
+                ref.read(configSidebarProvider.notifier).setOpen(false),
           ),
         ],
       ),

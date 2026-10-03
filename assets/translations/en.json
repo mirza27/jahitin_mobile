@@ -211,5 +211,13 @@
   "password_required": "Password cannot be empty",
   "name_required": "Name cannot be empty",
   "contact_permission_denied": "Contact access permission is required to select customer",
-  "general_error": "An error occurred. Please try again."
+  "general_error": "An error occurred. Please try again.",
+
+  "language": "Language",
+  "language_indonesia": "Indonesian (Bahasa Indonesia)",
+  "language_english": "English",
+  "language_change_title": "Change Language?",
+  "language_change_body": "The app will restart to apply the new language settings.",
+  "language_change_confirm": "Change & Restart",
+  "language_change_cancel": "Cancel"
 }

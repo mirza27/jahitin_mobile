@@ -12,7 +12,6 @@ class HomeState {
   final int activeOrderCount;
   final HomeTab selectedTab;
   final List<OrderDisplay> orderList;
-  final bool sidebarActive;
 
   const HomeState({
     this.status = HomeStatus.initial,
@@ -21,14 +20,7 @@ class HomeState {
     this.activeOrderCount = 0,
     this.selectedTab = HomeTab.active,
     this.orderList = const [],
-    this.sidebarActive = false,
   });
-
-  /// Nama user untuk greeting header, fallback ke 'Pengguna' jika null.
-  String get userName => user?.name ?? 'Pengguna';
-
-  /// Teks greeting lengkap untuk header.
-  String get greetingText => 'Halo, $userName \u{1F44B}';
 
   /// Daftar pesanan aktif (pending / in progress).
   List<OrderDisplay> get activeOrders => orderList
@@ -60,10 +52,6 @@ class HomeState {
     }
   }
 
-  /// Teks subtitle berisi jumlah pesanan aktif.
-  String get activeOrderSummary =>
-      'Anda memiliki ${activeOrders.length} pesanan aktif';
-
   HomeState copyWith({
     HomeStatus? status,
     User? user,
@@ -71,8 +59,6 @@ class HomeState {
     int? activeOrderCount,
     HomeTab? selectedTab,
     List<OrderDisplay>? orderList,
-    bool? sidebarActive,
-    bool? searchActive,
   }) {
     return HomeState(
       status: status ?? this.status,
@@ -81,7 +67,6 @@ class HomeState {
       activeOrderCount: activeOrderCount ?? this.activeOrderCount,
       selectedTab: selectedTab ?? this.selectedTab,
       orderList: orderList ?? this.orderList,
-      sidebarActive: sidebarActive ?? this.sidebarActive,
     );
   }
 }

@@ -211,5 +211,13 @@
   "password_required": "Password tidak boleh kosong",
   "name_required": "Nama tidak boleh kosong",
   "contact_permission_denied": "Izin akses kontak dibutuhkan untuk memilih pelanggan",
-  "general_error": "Terjadi kesalahan. Silakan coba lagi."
+  "general_error": "Terjadi kesalahan. Silakan coba lagi.",
+
+  "language": "Bahasa",
+  "language_indonesia": "Bahasa Indonesia",
+  "language_english": "Bahasa Inggris (English)",
+  "language_change_title": "Ubah Bahasa?",
+  "language_change_body": "Aplikasi akan dimuat ulang untuk menerapkan pengaturan bahasa yang baru.",
+  "language_change_confirm": "Ubah & Muat Ulang",
+  "language_change_cancel": "Batal"
 }

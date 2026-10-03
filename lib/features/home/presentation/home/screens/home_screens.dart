@@ -5,7 +5,8 @@ import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../../create_order/presentation/create_order/screen/create_order_screen.dart';
 import '../../../../detail_order/presentation/detail_order/screen/detail_order_screen.dart';
-import '../../../widgets/config_sidebar.dart';
+import '../../config_sidebar/config_sidebar_provider.dart';
+import '../../config_sidebar/widgets/config_sidebar.dart';
 import '../../order_search/screens/order_search_screen.dart';
 import '../home_provider.dart';
 import '../home_state.dart';
@@ -100,7 +101,7 @@ class HomeScreen extends ConsumerWidget {
         children: [
           IconButton(
             onPressed: () {
-              ref.read(homeProvider.notifier).toggleSidebar();
+              ref.read(configSidebarProvider.notifier).toggle();
             },
             icon: const Icon(
               Icons.menu,

@@ -75,14 +75,6 @@ class HomeNotifier extends Notifier<HomeState> {
     state = state.copyWith(selectedTab: tab);
   }
 
-  void toggleSidebar() {
-    state = state.copyWith(sidebarActive: !state.sidebarActive);
-  }
-
-  void setSidebarActive(bool active) {
-    state = state.copyWith(sidebarActive: active);
-  }
-
   void updateActiveOrderCount(int count) {
     state = state.copyWith(activeOrderCount: count);
   }

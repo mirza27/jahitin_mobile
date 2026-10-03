@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jahitin_mobile/core/services/storage_service.dart';
 import 'package:jahitin_mobile/core/constants/storage_keys.dart';
+import 'package:jahitin_mobile/core/providers/locale_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jahitin_mobile/features/splash/splash_state.dart';
 
@@ -27,6 +28,7 @@ class SplashNotifier extends Notifier<SplashState> {
 
     // Check & resolve language setting
     final storedLanguage = await storage.getLanguage();
+    String activeLang;
     if (storedLanguage == null || storedLanguage.isEmpty) {
       final osLang = ui.PlatformDispatcher.instance.locale.languageCode
           .toLowerCase();
@@ -35,7 +37,12 @@ class SplashNotifier extends Notifier<SplashState> {
           : StorageLanguage.en;
 
       await storage.setLanguage(resolvedLang);
+      activeLang = resolvedLang;
+    } else {
+      activeLang = storedLanguage;
     }
+
+    ref.read(localeProvider.notifier).updateFromLanguageCode(activeLang);
 
     final storageAppState = await storage.getAppState();
 

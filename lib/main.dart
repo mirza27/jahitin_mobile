@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'core/constants/app_colors.dart';
 import 'core/localization/app_localizations.dart';
+import 'core/providers/locale_provider.dart';
 import 'features/splash/screens/splash_screen.dart';
 
 void main() async {
@@ -14,14 +15,17 @@ void main() async {
   runApp(const ProviderScope(child: JahitinApp()));
 }
 
-class JahitinApp extends StatelessWidget {
+class JahitinApp extends ConsumerWidget {
   const JahitinApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentLocale = ref.watch(localeProvider);
+
     return MaterialApp(
       title: 'Jahitin',
       debugShowCheckedModeBanner: false,
+      locale: currentLocale,
       supportedLocales: const [
         Locale('en', 'US'),
         Locale('id', 'ID'),
