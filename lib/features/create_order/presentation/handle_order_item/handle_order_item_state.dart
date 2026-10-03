@@ -1,7 +1,6 @@
 import 'package:jahitin_mobile/core/models/clothes_category.dart';
 import 'package:jahitin_mobile/core/models/service_type.dart';
-
-import '../../../../core/models/job_item.dart';
+import 'package:jahitin_mobile/features/create_order/model/create_order_item.dart';
 
 class HandleOrderItemState {
   final String? itemId;
@@ -35,24 +34,22 @@ class HandleOrderItemState {
 
   bool get isEditMode => itemId != null;
 
-  JobItem toJobItem({required String fallbackRecipient}) {
-    return JobItem(
+  CreateOrderItem toCreateOrderItem({required String fallbackRecipient}) {
+    return CreateOrderItem(
       id: itemId ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      categoryId: selectedCategoryId,
-      categoryName: selectedCategoryId != null ? categoryName : null,
+      clothesCategoryId: selectedCategoryId,
+      clothesCategoryName: selectedCategoryId != null ? categoryName : null,
       serviceTypeId: selectedServiceTypeId,
-      serviceNameExplicit: selectedServiceTypeId != null ? serviceName : null,
+      serviceTypeName: selectedServiceTypeId != null ? serviceName : null,
       customServiceName:
           isCustomServiceMode && (customServiceName?.isNotEmpty ?? false)
           ? customServiceName
           : null,
-      recipientName: recipientName.trim().isNotEmpty
+      clothesFor: recipientName.trim().isNotEmpty
           ? recipientName.trim()
           : fallbackRecipient,
-      measurements: const BodyMeasurement(),
-      estimatedCost: cost ?? 0.0,
+      price: cost ?? 0.0,
       notes: notes?.trim().isEmpty ?? true ? null : notes?.trim(),
-      referencePhotoPaths: const [],
     );
   }
 

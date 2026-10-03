@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:jahitin_mobile/core/models/service_type.dart';
 import '../services/api_service.dart';
-import '../../features/detail_order/model/update_detail_order.dart';
 
 class ServiceTypeApi {
   ServiceTypeApi({http.Client? client}) : _client = client ?? http.Client();

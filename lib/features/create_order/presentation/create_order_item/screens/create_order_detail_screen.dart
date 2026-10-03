@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jahitin_mobile/features/create_order/model/create_order_item.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/localization/app_localizations_ext.dart';
-import '../../../../../core/models/job_item.dart';
 import '../../create_order/create_order_provider.dart';
 import '../../handle_order_item/handle_order_item_bottom_sheet.dart';
 import '../create_order_detail_provider.dart';
@@ -32,7 +32,7 @@ class _CreateOrderDetailScreenState
 
   Future<void> _openAddOrderItemSheet(
     BuildContext context, {
-    JobItem? existingOrderItem,
+    CreateOrderItem? existingOrderItem,
   }) async {
     final state = ref.read(createOrderDetailProvider);
     final defaultRecipient = state.customer?.displayName ?? '';

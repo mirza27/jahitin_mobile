@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jahitin_mobile/core/models/clothes_category.dart';
 import 'package:jahitin_mobile/core/models/service_type.dart';
+import 'package:jahitin_mobile/features/create_order/model/create_order_item.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/localization/app_localizations_ext.dart';
-import '../../../../../core/models/job_item.dart';
 import 'handle_order_item_provider.dart';
 import 'widgets/clothes_category_selector.dart';
 import 'widgets/cost_input_field.dart';
@@ -13,7 +13,7 @@ import 'widgets/recipient_input_field.dart';
 import 'widgets/service_type_selector.dart';
 
 class HandleOrderItemBottomSheet extends ConsumerStatefulWidget {
-  final JobItem? existingOrderItem;
+  final CreateOrderItem? existingOrderItem;
   final String defaultRecipientName;
   final List<ClothesCategoryModel> categories;
   final List<ServiceTypeModel> serviceTypes;
@@ -26,14 +26,14 @@ class HandleOrderItemBottomSheet extends ConsumerStatefulWidget {
     this.serviceTypes = const [],
   });
 
-  static Future<JobItem?> show(
+  static Future<CreateOrderItem?> show(
     BuildContext context, {
-    JobItem? existingOrderItem,
+    CreateOrderItem? existingOrderItem,
     required String defaultRecipientName,
     List<ClothesCategoryModel> categories = const [],
     List<ServiceTypeModel> serviceTypes = const [],
   }) {
-    return showModalBottomSheet<JobItem>(
+    return showModalBottomSheet<CreateOrderItem>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -75,7 +75,7 @@ class _HandleOrderItemBottomSheetState
 
   void _submit() {
     final state = ref.read(handleOrderItemProvider);
-    final result = state.toJobItem(
+    final result = state.toCreateOrderItem(
       fallbackRecipient: widget.defaultRecipientName,
     );
     Navigator.of(context).pop(result);

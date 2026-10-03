@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jahitin_mobile/core/models/clothes_category.dart';
 import 'package:jahitin_mobile/core/models/service_type.dart';
+import 'package:jahitin_mobile/features/create_order/model/create_order_item.dart';
 import '../../../../core/data/clothes_category_api.dart';
 import '../../../../core/data/order_api.dart';
 import '../../../../core/data/service_type_api.dart';
-import '../../../../core/models/job_item.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../model/create_order_request.dart';
 import '../create_order/create_order_provider.dart';
@@ -58,11 +58,11 @@ class CreateOrderDetailNotifier extends Notifier<CreateOrderDetailState> {
     }
   }
 
-  void addOrderItem(JobItem orderItem) {
+  void addOrderItem(CreateOrderItem orderItem) {
     state = state.copyWith(orderItems: [...state.orderItems, orderItem]);
   }
 
-  void updateOrderItem(JobItem updatedOrderItem) {
+  void updateOrderItem(CreateOrderItem updatedOrderItem) {
     state = state.copyWith(
       orderItems: state.orderItems
           .map(
@@ -97,15 +97,14 @@ class CreateOrderDetailNotifier extends Notifier<CreateOrderDetailState> {
 
     final orderItems = state.orderItems.map((item) {
       return CreateOrderItemRequest(
-        clothesFor: item.recipientName.isNotEmpty
-            ? item.recipientName
+        clothesFor: item.clothesFor.isNotEmpty
+            ? item.clothesFor
             : (state.customer?.displayName ?? ''),
         notes: item.notes ?? '',
-        categoryId: item.resolvedCategoryId,
-        serviceId: item.resolvedServiceTypeId,
-        customServiceName:
-            item.customServiceName ?? item.customCategoryName ?? '',
-        price: item.estimatedCost,
+        categoryId: item.clothesCategoryId ?? 1,
+        serviceId: item.serviceTypeId,
+        customServiceName: item.customServiceName ?? '',
+        price: item.price,
         saveCustomerNotes: false,
       );
     }).toList();

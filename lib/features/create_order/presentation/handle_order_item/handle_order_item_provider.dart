@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jahitin_mobile/core/models/clothes_category.dart';
 import 'package:jahitin_mobile/core/models/service_type.dart';
-import '../../../../core/models/job_item.dart';
+import 'package:jahitin_mobile/features/create_order/model/create_order_item.dart';
 import 'handle_order_item_state.dart';
 
 final handleOrderItemProvider =
@@ -18,7 +18,7 @@ class HandleOrderItemNotifier
 
   /// Inisialisasi saat sheet dibuka untuk create baru atau edit item
   void initialize({
-    JobItem? existingItem,
+    CreateOrderItem? existingItem,
     required String defaultRecipient,
     List<ClothesCategoryModel> categories = const [],
     List<ServiceTypeModel> serviceTypes = const [],
@@ -33,15 +33,15 @@ class HandleOrderItemNotifier
 
       state = HandleOrderItemState(
         itemId: existingItem.id,
-        recipientName: existingItem.recipientName,
-        selectedCategoryId: existingItem.categoryId,
-        categoryName: existingItem.categoryName,
+        recipientName: existingItem.clothesFor,
+        selectedCategoryId: existingItem.clothesCategoryId,
+        categoryName: existingItem.clothesCategoryName,
         selectedServiceTypeId: existingItem.serviceTypeId,
-        serviceName: existingItem.serviceNameExplicit,
+        serviceName: existingItem.serviceTypeName,
         customServiceName: existingItem.customServiceName,
         isCustomServiceMode: isCustomService,
-        cost: existingItem.estimatedCost > 0
-            ? existingItem.estimatedCost
+        cost: existingItem.price > 0
+            ? existingItem.price
             : null,
         notes: existingItem.notes,
         categories: categories,

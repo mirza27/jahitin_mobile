@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jahitin_mobile/features/create_order/model/create_order_item.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/localization/app_localizations_ext.dart';
-import '../../../../../core/models/job_item.dart';
 
 class OrderItemCard extends StatelessWidget {
-  final JobItem item;
+  final CreateOrderItem item;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -24,7 +24,7 @@ class OrderItemCard extends StatelessWidget {
       decimalDigits: 0,
     );
 
-    final serviceText = item.serviceName;
+    final serviceText = item.displayServiceName;
 
     return Container(
       width: double.infinity,
@@ -47,7 +47,7 @@ class OrderItemCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          item.displayName,
+                          item.displayCategoryName,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -81,7 +81,7 @@ class OrderItemCard extends StatelessWidget {
                     Text(
                       context.tr(
                         'for_recipient_prefix',
-                        params: {'name': item.recipientName},
+                        params: {'name': item.clothesFor},
                       ),
                       style: const TextStyle(
                         fontSize: 13,
@@ -150,7 +150,7 @@ class OrderItemCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                currencyFormatter.format(item.estimatedCost),
+                currencyFormatter.format(item.price),
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -195,3 +195,4 @@ class OrderItemCard extends StatelessWidget {
     );
   }
 }
+

@@ -1,7 +1,7 @@
 import 'package:jahitin_mobile/core/models/clothes_category.dart';
 import 'package:jahitin_mobile/core/models/service_type.dart';
+import 'package:jahitin_mobile/features/create_order/model/create_order_item.dart';
 
-import '../../../../core/models/job_item.dart';
 import '../../model/customer_contact.dart';
 
 enum OrderDetailStatus { initial, loading, ready, submitting, success, error }
@@ -12,7 +12,7 @@ class CreateOrderDetailState {
   final CustomerContact? customer;
   final DateTime? deadline;
   final String orderNotes;
-  final List<JobItem> orderItems;
+  final List<CreateOrderItem> orderItems;
   final double downPayment;
   final String? errorMessage;
   final List<ClothesCategoryModel> clothesCategories;
@@ -36,7 +36,7 @@ class CreateOrderDetailState {
   });
 
   double get totalCost =>
-      orderItems.fold(0.0, (sum, item) => sum + item.estimatedCost);
+      orderItems.fold(0.0, (sum, item) => sum + item.price);
 
   double get remainingBalance =>
       (totalCost - downPayment).clamp(0.0, double.infinity);
@@ -52,7 +52,7 @@ class CreateOrderDetailState {
     CustomerContact? customer,
     DateTime? deadline,
     String? orderNotes,
-    List<JobItem>? orderItems,
+    List<CreateOrderItem>? orderItems,
     double? downPayment,
     String? errorMessage,
     List<ClothesCategoryModel>? clothesCategories,
