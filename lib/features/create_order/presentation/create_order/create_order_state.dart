@@ -9,6 +9,7 @@ class CreateOrderState {
   final DateTime? deadline;
   final int? selectedQuickDays;
   final String notes;
+  final bool saveCustomerNotes;
   final String? errorMessage;
 
   const CreateOrderState({
@@ -18,6 +19,7 @@ class CreateOrderState {
     this.deadline,
     this.selectedQuickDays,
     this.notes = '',
+    this.saveCustomerNotes = false,
     this.errorMessage,
   });
 
@@ -38,6 +40,7 @@ class CreateOrderState {
     int? selectedQuickDays,
     bool clearQuickDays = false,
     String? notes,
+    bool? saveCustomerNotes,
     String? errorMessage,
   }) {
     return CreateOrderState(
@@ -51,6 +54,7 @@ class CreateOrderState {
           ? null
           : (selectedQuickDays ?? this.selectedQuickDays),
       notes: notes ?? this.notes,
+      saveCustomerNotes: saveCustomerNotes ?? this.saveCustomerNotes,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }

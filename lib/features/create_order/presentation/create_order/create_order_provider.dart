@@ -38,6 +38,10 @@ class CreateOrderNotifier extends Notifier<CreateOrderState> {
     state = state.copyWith(notes: notes);
   }
 
+  void setSaveCustomerNotes(bool value) {
+    state = state.copyWith(saveCustomerNotes: value);
+  }
+
   void reset() {
     state = build();
   }

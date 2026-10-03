@@ -86,8 +86,10 @@
   "order_name_label": "Order Name: ",
   "default_order_name": "New Order",
   "order_notes_title": "Order Notes",
-  "order_notes_subtitle": "General notes for the entire order (optional)",
-  "order_notes_hint": "e.g., Fabric provided by customer, trim neatly...",
+  "order_notes_subtitle": "Can be used to save body measurements, special instructions, or general notes (optional)",
+  "order_notes_hint": "e.g., Bust 100cm, sleeve 55cm, or fabric provided by customer...",
+  "save_customer_notes_title": "Save notes for this customer",
+  "save_customer_notes_subtitle": "This note will be saved to the customer's profile for future orders",
 
   "target_deadline_title": "Target Completion Date",
   "target_deadline_subtitle": "Optional — leave empty if there is no deadline",

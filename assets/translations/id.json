@@ -86,8 +86,10 @@
   "order_name_label": "Nama Pesanan: ",
   "default_order_name": "Pesanan Baru",
   "order_notes_title": "Catatan Pesanan",
-  "order_notes_subtitle": "Catatan umum untuk seluruh pesanan (opsional)",
-  "order_notes_hint": "Contoh: Kain sudah disediakan, minta dipotong rapi...",
+  "order_notes_subtitle": "Dapat digunakan untuk menyimpan ukuran baju, instruksi khusus, atau catatan umum (opsional)",
+  "order_notes_hint": "Contoh: Ukuran LD 100cm, PL 55cm, atau kain dari pelanggan...",
+  "save_customer_notes_title": "Simpan catatan untuk pelanggan ini",
+  "save_customer_notes_subtitle": "Catatan ini akan tersimpan di data pelanggan untuk pesanan berikutnya",
 
   "target_deadline_title": "Target Tanggal Selesai",
   "target_deadline_subtitle": "Opsional — kosongkan jika belum ada target waktu",

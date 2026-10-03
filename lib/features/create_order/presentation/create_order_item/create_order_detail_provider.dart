@@ -23,6 +23,7 @@ class CreateOrderDetailNotifier extends Notifier<CreateOrderDetailState> {
       customer: step1State.selectedCustomer,
       deadline: step1State.deadline,
       orderNotes: step1State.notes,
+      saveCustomerNotes: step1State.saveCustomerNotes,
       orderItems: const [],
       downPayment: 0,
     );
@@ -105,7 +106,7 @@ class CreateOrderDetailNotifier extends Notifier<CreateOrderDetailState> {
         serviceId: item.serviceTypeId,
         customServiceName: item.customServiceName ?? '',
         price: item.price,
-        saveCustomerNotes: false,
+        saveCustomerNotes: state.saveCustomerNotes,
       );
     }).toList();
 
