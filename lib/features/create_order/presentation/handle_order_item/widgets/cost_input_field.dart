@@ -1,8 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/localization/app_localizations_ext.dart';
 import '../handle_order_item_provider.dart';
+
+class ThousandsSeparatorInputFormatter extends TextInputFormatter {
+  final NumberFormat _formatter = NumberFormat.decimalPattern('id_ID');
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+
+    final cleanText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+    if (cleanText.isEmpty) {
+      return const TextEditingValue(
+        text: '',
+        selection: TextSelection.collapsed(offset: 0),
+      );
+    }
+
+    final number = int.tryParse(cleanText);
+    if (number == null) return oldValue;
+
+    final formatted = _formatter.format(number);
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
 
 class CostInputField extends ConsumerStatefulWidget {
   const CostInputField({super.key});
@@ -13,13 +47,14 @@ class CostInputField extends ConsumerStatefulWidget {
 
 class _CostInputFieldState extends ConsumerState<CostInputField> {
   late final TextEditingController _controller;
+  final _formatter = NumberFormat.decimalPattern('id_ID');
 
   @override
   void initState() {
     super.initState();
     final cost = ref.read(handleOrderItemProvider).cost;
     _controller = TextEditingController(
-      text: cost != null && cost > 0 ? cost.toStringAsFixed(0) : '',
+      text: cost != null && cost > 0 ? _formatter.format(cost.toInt()) : '',
     );
   }
 
@@ -29,16 +64,11 @@ class _CostInputFieldState extends ConsumerState<CostInputField> {
     super.dispose();
   }
 
-  double? _parseDouble(String text) {
-    final cleaned = text.trim().replaceAll(',', '.');
-    if (cleaned.isEmpty) return null;
-    return double.tryParse(cleaned);
-  }
-
   @override
   Widget build(BuildContext context) {
     ref.listen(handleOrderItemProvider.select((s) => s.cost), (prev, next) {
-      final formattedNext = next != null && next > 0 ? next.toStringAsFixed(0) : '';
+      final formattedNext =
+          next != null && next > 0 ? _formatter.format(next.toInt()) : '';
       if (_controller.text != formattedNext) {
         _controller.text = formattedNext;
       }
@@ -77,6 +107,10 @@ class _CostInputFieldState extends ConsumerState<CostInputField> {
         TextField(
           controller: _controller,
           keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            ThousandsSeparatorInputFormatter(),
+          ],
           decoration: InputDecoration(
             prefixText: 'Rp  ',
             prefixStyle: const TextStyle(
@@ -109,7 +143,9 @@ class _CostInputFieldState extends ConsumerState<CostInputField> {
             ),
           ),
           onChanged: (v) {
-            final parsedCost = _parseDouble(v);
+            final cleanText = v.replaceAll(RegExp(r'[^\d]'), '');
+            final parsedCost =
+                cleanText.isEmpty ? null : double.tryParse(cleanText);
             ref.read(handleOrderItemProvider.notifier).setCost(parsedCost);
           },
         ),

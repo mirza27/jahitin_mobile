@@ -44,6 +44,7 @@ class HandleOrderItemNotifier
             ? existingItem.price
             : null,
         notes: existingItem.notes,
+        saveCustomerNotes: existingItem.saveCustomerNotes,
         categories: categories,
         serviceTypes: serviceTypes,
       );
@@ -111,5 +112,9 @@ class HandleOrderItemNotifier
 
   void setNotes(String? notes) {
     state = state.copyWith(notes: () => notes);
+  }
+
+  void setSaveCustomerNotes(bool value) {
+    state = state.copyWith(saveCustomerNotes: value);
   }
 }

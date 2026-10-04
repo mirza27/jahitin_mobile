@@ -26,31 +26,40 @@ class CreateOrderRequest {
 class CreateOrderItemRequest {
   final String clothesFor;
   final String notes;
-  final int categoryId;
+  final int? categoryId;
   final int? serviceId;
   final String? customServiceName;
-  final num? price;
+  final int price;
   final bool saveCustomerNotes;
 
   CreateOrderItemRequest({
     required this.clothesFor,
     required this.notes,
-    required this.categoryId,
+    this.categoryId,
     this.serviceId,
     this.customServiceName,
-    this.price,
+    required this.price,
     required this.saveCustomerNotes,
   });
 
   Map<String, dynamic> toJson() {
-    return {
+    final map = <String, dynamic>{
       'clothes_for': clothesFor,
       'notes': notes,
-      'clothes_category_id': categoryId,
-      'service_type_id': serviceId,
-      'custom_service_name': customServiceName ?? '',
-      'price': price != null ? price!.toInt() : 0,
+      'price': price,
       'is_save_customer_notes': saveCustomerNotes,
     };
+
+    if (categoryId != null) {
+      map['clothes_category_id'] = categoryId;
+    }
+
+    if (serviceId != null) {
+      map['service_type_id'] = serviceId;
+    } else if (customServiceName != null && customServiceName!.isNotEmpty) {
+      map['custom_service_name'] = customServiceName;
+    }
+
+    return map;
   }
 }

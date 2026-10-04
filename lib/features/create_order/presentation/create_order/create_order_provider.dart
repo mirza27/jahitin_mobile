@@ -34,14 +34,6 @@ class CreateOrderNotifier extends Notifier<CreateOrderState> {
     state = state.copyWith(deadline: target, selectedQuickDays: days);
   }
 
-  void updateNotes(String notes) {
-    state = state.copyWith(notes: notes);
-  }
-
-  void setSaveCustomerNotes(bool value) {
-    state = state.copyWith(saveCustomerNotes: value);
-  }
-
   void reset() {
     state = build();
   }

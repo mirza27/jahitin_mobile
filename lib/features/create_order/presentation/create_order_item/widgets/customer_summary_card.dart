@@ -8,7 +8,6 @@ class CustomerSummaryCard extends StatelessWidget {
   final String orderName;
   final CustomerContact? customer;
   final DateTime? deadline;
-  final String orderNotes;
   final VoidCallback? onEditStep1;
 
   const CustomerSummaryCard({
@@ -16,7 +15,6 @@ class CustomerSummaryCard extends StatelessWidget {
     required this.orderName,
     required this.customer,
     required this.deadline,
-    required this.orderNotes,
     this.onEditStep1,
   });
 
@@ -147,30 +145,6 @@ class CustomerSummaryCard extends StatelessWidget {
               ),
             ],
           ),
-          if (orderNotes.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(
-                  Icons.note_alt_outlined,
-                  size: 16,
-                  color: AppColors.textSecondary,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    orderNotes,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
         ],
       ),
     );

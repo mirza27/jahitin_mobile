@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jahitin_mobile/features/create_order/model/create_order_item.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/localization/app_localizations_ext.dart';
+import '../../../../home/presentation/home/home_provider.dart';
 import '../../create_order/create_order_provider.dart';
 import '../../handle_order_item/handle_order_item_bottom_sheet.dart';
+import '../../select_customer/select_customer_provider.dart';
 import '../create_order_detail_provider.dart';
 import '../create_order_detail_state.dart';
 import '../widgets/bottom_action_bar.dart';
@@ -56,7 +58,9 @@ class _CreateOrderDetailScreenState
 
   void _handleSuccess(String message) {
     ref.read(createOrderProvider.notifier).reset();
+    ref.read(selectCustomerProvider.notifier).clearCustomer();
     ref.read(createOrderDetailProvider.notifier).reset();
+    ref.read(homeProvider.notifier).refreshOrders();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -123,7 +127,6 @@ class _CreateOrderDetailScreenState
                       orderName: state.orderName,
                       customer: state.customer,
                       deadline: state.deadline,
-                      orderNotes: state.orderNotes,
                       onEditStep1: () => Navigator.of(context).pop(),
                     ),
                     const SizedBox(height: 24),

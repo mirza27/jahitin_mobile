@@ -8,6 +8,7 @@ class CreateOrderItem {
   final String? customServiceName;
   final double price;
   final String? notes;
+  final bool saveCustomerNotes;
 
   const CreateOrderItem({
     required this.id,
@@ -19,6 +20,7 @@ class CreateOrderItem {
     this.customServiceName,
     required this.price,
     this.notes,
+    this.saveCustomerNotes = false,
   });
 
   /// Nama tampilan kategori pakaian.

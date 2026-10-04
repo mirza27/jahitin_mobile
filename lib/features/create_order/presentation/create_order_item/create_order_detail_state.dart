@@ -11,8 +11,6 @@ class CreateOrderDetailState {
   final String orderName;
   final CustomerContact? customer;
   final DateTime? deadline;
-  final String orderNotes;
-  final bool saveCustomerNotes;
   final List<CreateOrderItem> orderItems;
   final double downPayment;
   final String? errorMessage;
@@ -26,8 +24,6 @@ class CreateOrderDetailState {
     this.orderName = '',
     this.customer,
     this.deadline,
-    this.orderNotes = '',
-    this.saveCustomerNotes = false,
     this.orderItems = const [],
     this.downPayment = 0,
     this.errorMessage,
@@ -53,8 +49,6 @@ class CreateOrderDetailState {
     String? orderName,
     CustomerContact? customer,
     DateTime? deadline,
-    String? orderNotes,
-    bool? saveCustomerNotes,
     List<CreateOrderItem>? orderItems,
     double? downPayment,
     String? errorMessage,
@@ -68,8 +62,6 @@ class CreateOrderDetailState {
       orderName: orderName ?? this.orderName,
       customer: customer ?? this.customer,
       deadline: deadline ?? this.deadline,
-      orderNotes: orderNotes ?? this.orderNotes,
-      saveCustomerNotes: saveCustomerNotes ?? this.saveCustomerNotes,
       orderItems: orderItems ?? this.orderItems,
       downPayment: downPayment ?? this.downPayment,
       errorMessage: errorMessage ?? this.errorMessage,

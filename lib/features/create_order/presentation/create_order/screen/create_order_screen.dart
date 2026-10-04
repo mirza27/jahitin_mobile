@@ -18,7 +18,6 @@ class CreateOrderScreen extends ConsumerStatefulWidget {
 
 class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
   final TextEditingController _orderNameController = TextEditingController();
-  final TextEditingController _notesController = TextEditingController();
   bool _permissionChecked = false;
 
   @override
@@ -30,12 +29,6 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
       ref
           .read(createOrderProvider.notifier)
           .updateOrderName(_orderNameController.text);
-    });
-
-    final currentNotes = ref.read(createOrderProvider).notes;
-    _notesController.text = currentNotes;
-    _notesController.addListener(() {
-      ref.read(createOrderProvider.notifier).updateNotes(_notesController.text);
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -59,7 +52,6 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
   @override
   void dispose() {
     _orderNameController.dispose();
-    _notesController.dispose();
     super.dispose();
   }
 
@@ -176,109 +168,6 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
                     const CustomerSearchField(),
                     const SizedBox(height: 24),
                     const DeadlinePickerSection(),
-                    const SizedBox(height: 24),
-                    Text(
-                      context.tr('order_notes_title'),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      context.tr('order_notes_subtitle'),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _notesController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: context.tr('order_notes_hint'),
-                        hintStyle: const TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textHint,
-                        ),
-                        filled: true,
-                        fillColor: AppColors.surface,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.border),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.border),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: AppColors.primary,
-                            width: 1.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    InkWell(
-                      onTap: () {
-                        ref
-                            .read(createOrderProvider.notifier)
-                            .setSaveCustomerNotes(!state.saveCustomerNotes);
-                      },
-                      borderRadius: BorderRadius.circular(10),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: Checkbox(
-                                value: state.saveCustomerNotes,
-                                onChanged: (value) {
-                                  ref
-                                      .read(createOrderProvider.notifier)
-                                      .setSaveCustomerNotes(value ?? false);
-                                },
-                                activeColor: AppColors.primary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    context.tr('save_customer_notes_title'),
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    context.tr('save_customer_notes_subtitle'),
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.textSecondary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),

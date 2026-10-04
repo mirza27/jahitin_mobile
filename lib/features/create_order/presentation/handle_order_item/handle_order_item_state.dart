@@ -13,6 +13,7 @@ class HandleOrderItemState {
   final bool isCustomServiceMode;
   final double? cost;
   final String? notes;
+  final bool saveCustomerNotes;
 
   final List<ClothesCategoryModel> categories;
   final List<ServiceTypeModel> serviceTypes;
@@ -28,6 +29,7 @@ class HandleOrderItemState {
     this.isCustomServiceMode = false,
     this.cost,
     this.notes,
+    this.saveCustomerNotes = false,
     this.categories = const [],
     this.serviceTypes = const [],
   });
@@ -50,6 +52,7 @@ class HandleOrderItemState {
           : fallbackRecipient,
       price: cost ?? 0.0,
       notes: notes?.trim().isEmpty ?? true ? null : notes?.trim(),
+      saveCustomerNotes: saveCustomerNotes,
     );
   }
 
@@ -64,6 +67,7 @@ class HandleOrderItemState {
     bool? isCustomServiceMode,
     double? Function()? cost,
     String? Function()? notes,
+    bool? saveCustomerNotes,
     List<ClothesCategoryModel>? categories,
     List<ServiceTypeModel>? serviceTypes,
   }) {
@@ -84,6 +88,7 @@ class HandleOrderItemState {
       isCustomServiceMode: isCustomServiceMode ?? this.isCustomServiceMode,
       cost: cost != null ? cost() : this.cost,
       notes: notes != null ? notes() : this.notes,
+      saveCustomerNotes: saveCustomerNotes ?? this.saveCustomerNotes,
       categories: categories ?? this.categories,
       serviceTypes: serviceTypes ?? this.serviceTypes,
     );

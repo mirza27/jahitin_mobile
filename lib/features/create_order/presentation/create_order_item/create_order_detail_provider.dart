@@ -22,8 +22,6 @@ class CreateOrderDetailNotifier extends Notifier<CreateOrderDetailState> {
           : 'Pesanan Baru',
       customer: step1State.selectedCustomer,
       deadline: step1State.deadline,
-      orderNotes: step1State.notes,
-      saveCustomerNotes: step1State.saveCustomerNotes,
       orderItems: const [],
       downPayment: 0,
     );
@@ -85,15 +83,29 @@ class CreateOrderDetailNotifier extends Notifier<CreateOrderDetailState> {
     state = state.copyWith(downPayment: amount);
   }
 
+  String _formatDateTimeWithOffset(DateTime dateTime) {
+    final offset = dateTime.timeZoneOffset;
+    final sign = offset.isNegative ? '-' : '+';
+    final hours = offset.inHours.abs().toString().padLeft(2, '0');
+    final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
+
+    final year = dateTime.year.toString().padLeft(4, '0');
+    final month = dateTime.month.toString().padLeft(2, '0');
+    final day = dateTime.day.toString().padLeft(2, '0');
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    final second = dateTime.second.toString().padLeft(2, '0');
+
+    return '$year-$month-${day}T$hour:$minute:$second$sign$hours:$minutes';
+  }
+
   CreateOrderRequest buildCreateOrderRequest({bool isDraft = false}) {
     final orderName = state.orderName.isNotEmpty
         ? state.orderName
-        : (state.orderNotes.isNotEmpty
-              ? state.orderNotes
-              : (state.customer?.displayName ?? 'Pesanan'));
+        : (state.customer?.displayName ?? 'Pesanan Baru');
 
     final deadlineStr = state.deadline != null
-        ? state.deadline!.toIso8601String()
+        ? _formatDateTimeWithOffset(state.deadline!)
         : '';
 
     final orderItems = state.orderItems.map((item) {
@@ -101,12 +113,14 @@ class CreateOrderDetailNotifier extends Notifier<CreateOrderDetailState> {
         clothesFor: item.clothesFor.isNotEmpty
             ? item.clothesFor
             : (state.customer?.displayName ?? ''),
-        notes: item.notes ?? '',
-        categoryId: item.clothesCategoryId ?? 1,
+        categoryId: item.clothesCategoryId,
         serviceId: item.serviceTypeId,
-        customServiceName: item.customServiceName ?? '',
-        price: item.price,
-        saveCustomerNotes: state.saveCustomerNotes,
+        customServiceName: item.serviceTypeId == null
+            ? item.customServiceName
+            : null,
+        price: item.price.toInt(),
+        notes: item.notes ?? '',
+        saveCustomerNotes: item.saveCustomerNotes,
       );
     }).toList();
 
