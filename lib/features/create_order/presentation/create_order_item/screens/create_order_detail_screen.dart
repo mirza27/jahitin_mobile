@@ -38,6 +38,10 @@ class _CreateOrderDetailScreenState
   }) async {
     final state = ref.read(createOrderDetailProvider);
     final defaultRecipient = state.customer?.displayName ?? '';
+    final bool isFirstItem = existingOrderItem != null
+        ? (state.orderItems.isNotEmpty &&
+            state.orderItems.first.id == existingOrderItem.id)
+        : state.orderItems.isEmpty;
 
     final result = await HandleOrderItemBottomSheet.show(
       context,
@@ -45,6 +49,7 @@ class _CreateOrderDetailScreenState
       defaultRecipientName: defaultRecipient,
       categories: state.clothesCategories,
       serviceTypes: state.serviceTypes,
+      isFirstItem: isFirstItem,
     );
 
     if (result != null) {
@@ -129,41 +134,19 @@ class _CreateOrderDetailScreenState
                       deadline: state.deadline,
                       onEditStep1: () => Navigator.of(context).pop(),
                     ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          context.tr(
-                            'job_list_with_count',
-                            params: {'count': '${state.orderItems.length}'},
-                          ),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        if (state.orderItems.isNotEmpty)
-                          TextButton.icon(
-                            onPressed: () => _openAddOrderItemSheet(context),
-                            icon: const Icon(
-                              Icons.add,
-                              size: 18,
-                              color: AppColors.primary,
-                            ),
-                            label: Text(
-                              context.tr('add'),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                      ],
+                    const SizedBox(height: 14),
+                    Text(
+                      context.tr(
+                        'job_list_with_count',
+                        params: {'count': '${state.orderItems.length}'},
+                      ),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     if (state.orderItems.isEmpty)
                       _buildEmptyOrderItemsPrompt(context)
                     else ...[

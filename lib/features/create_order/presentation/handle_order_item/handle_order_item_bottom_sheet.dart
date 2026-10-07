@@ -17,6 +17,7 @@ class HandleOrderItemBottomSheet extends ConsumerStatefulWidget {
   final String defaultRecipientName;
   final List<ClothesCategoryModel> categories;
   final List<ServiceTypeModel> serviceTypes;
+  final bool isFirstItem;
 
   const HandleOrderItemBottomSheet({
     super.key,
@@ -24,6 +25,7 @@ class HandleOrderItemBottomSheet extends ConsumerStatefulWidget {
     required this.defaultRecipientName,
     this.categories = const [],
     this.serviceTypes = const [],
+    this.isFirstItem = true,
   });
 
   static Future<CreateOrderItem?> show(
@@ -32,6 +34,7 @@ class HandleOrderItemBottomSheet extends ConsumerStatefulWidget {
     required String defaultRecipientName,
     List<ClothesCategoryModel> categories = const [],
     List<ServiceTypeModel> serviceTypes = const [],
+    bool isFirstItem = true,
   }) {
     return showModalBottomSheet<CreateOrderItem>(
       context: context,
@@ -46,6 +49,7 @@ class HandleOrderItemBottomSheet extends ConsumerStatefulWidget {
           defaultRecipientName: defaultRecipientName,
           categories: categories,
           serviceTypes: serviceTypes,
+          isFirstItem: isFirstItem,
         ),
       ),
     );
@@ -112,7 +116,7 @@ class _HandleOrderItemBottomSheetState
                   const SizedBox(height: 20),
                   const CostInputField(),
                   const SizedBox(height: 20),
-                  const NotesInputField(),
+                  NotesInputField(isFirstItem: widget.isFirstItem),
                   const SizedBox(height: 28),
                   _buildSubmitButton(context),
                 ],

@@ -5,7 +5,12 @@ import '../../../../../core/localization/app_localizations_ext.dart';
 import '../handle_order_item_provider.dart';
 
 class NotesInputField extends ConsumerStatefulWidget {
-  const NotesInputField({super.key});
+  final bool isFirstItem;
+
+  const NotesInputField({
+    super.key,
+    this.isFirstItem = true,
+  });
 
   @override
   ConsumerState<NotesInputField> createState() => _NotesInputFieldState();
@@ -100,70 +105,72 @@ class _NotesInputFieldState extends ConsumerState<NotesInputField> {
                 );
           },
         ),
-        const SizedBox(height: 10),
-        Consumer(
-          builder: (context, ref, child) {
-            final saveCustomerNotes = ref.watch(
-              handleOrderItemProvider.select((s) => s.saveCustomerNotes),
-            );
-            return InkWell(
-              onTap: () {
-                ref
-                    .read(handleOrderItemProvider.notifier)
-                    .setSaveCustomerNotes(!saveCustomerNotes);
-              },
-              borderRadius: BorderRadius.circular(10),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: Checkbox(
-                        value: saveCustomerNotes,
-                        onChanged: (value) {
-                          ref
-                              .read(handleOrderItemProvider.notifier)
-                              .setSaveCustomerNotes(value ?? false);
-                        },
-                        activeColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
+        if (widget.isFirstItem) ...[
+          const SizedBox(height: 10),
+          Consumer(
+            builder: (context, ref, child) {
+              final saveCustomerNotes = ref.watch(
+                handleOrderItemProvider.select((s) => s.saveCustomerNotes),
+              );
+              return InkWell(
+                onTap: () {
+                  ref
+                      .read(handleOrderItemProvider.notifier)
+                      .setSaveCustomerNotes(!saveCustomerNotes);
+                },
+                borderRadius: BorderRadius.circular(10),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: Checkbox(
+                          value: saveCustomerNotes,
+                          onChanged: (value) {
+                            ref
+                                .read(handleOrderItemProvider.notifier)
+                                .setSaveCustomerNotes(value ?? false);
+                          },
+                          activeColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.tr('save_customer_notes_title'),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              context.tr('save_customer_notes_title'),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            context.tr('save_customer_notes_subtitle'),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
+                            const SizedBox(height: 2),
+                            Text(
+                              context.tr('save_customer_notes_subtitle'),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
+              );
+            },
+          ),
+        ],
       ],
     );
   }
